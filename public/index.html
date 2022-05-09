@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>五子棋</title>
+    <script src="bundle.js"></script>
+  </head>
+  <body>
+    <div class="app">
+      <canvas id="stage"></canvas>
+      <!-- move的控制关键字是top/bottom/left/right/half-right/origin -->
+      <div class="move" id="room-title" data-position="top">
+        房间列表
+        <div class="btns">
+          <button class="btn btn-dark" id="btn-refresh">刷新列表</button>
+          <button class="btn btn-primary" id="btn-create">创建房间</button>
+        </div>
+      </div>
+      <div class="control-panel">
+        <div
+          class="move player-panel black"
+          id="player-1"
+          data-position="right"
+        >
+          <div class="player-name"></div>
+          <div class="now-holding">的回合</div>
+        </div>
+        <div
+          class="move player-panel white"
+          id="player-2"
+          data-position="right"
+        >
+          <div class="player-name"></div>
+          <div class="now-holding">的回合</div>
+        </div>
+        <!-- collapse的控制关键字是collapse和open -->
+        <div
+          class="move collapse"
+          id="normal-collapse"
+          data-toggle="open"
+          data-position="bottom"
+        >
+          <div class="collapse-inner">
+            <div class="btns">
+              <button class="btn btn-danger" id="btn-abort">终止</button>
+              <button class="btn btn-primary" id="btn-retract">悔棋</button>
+            </div>
+          </div>
+        </div>
+        <!-- 请求悔棋前的确认 以及 收到悔棋时的确认 -->
+        <div class="card collapse" id="confirm-collapse" data-toggle="collapse">
+          <div class="collapse-inner">
+            <div class="card-body" id="confirm-message"></div>
+            <div class="btns">
+              <button class="btn btn-dark" id="btn-cancel"></button>
+              <button class="btn btn-danger" id="btn-confirm"></button>
+            </div>
+          </div>
+        </div>
+        <div class="move card" data-position="bottom">
+          <div class="card-body">
+            <div id="message-box"></div>
+          </div>
+          <div class="sender">
+            <textarea id="message-input" placeholder="发送给对手"></textarea>
+            <button class="btn btn-primary" id="btn-send">发送</button>
+          </div>
+        </div>
+      </div>
+        <!-- modal的控制关键字是hide和open -->
+        <div class="modal" data-toggle="hide" id="input-modal">
+          <div class="modal-content">
+            <div class="modal-header">游戏配置</div>
+            <div class="modal-body">
+              <div class="form-line">
+                <label for="nickname">昵称</label>
+                <div class="input-wrapper">
+                  <input type="text" id="nickname" />
+                </div>
+              </div>
+              <div class="form-line">
+                <label for="server-url">服务器URL</label>
+                <div class="input-wrapper">
+                  <input type="text" id="server-url" />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="btns">
+                <button class="btn btn-primary" id="btn-confirm-nickname">
+                  进入游戏
+                </button>
+                <button class="btn btn-dark" id="btn-cancel-nickname">
+                  退出
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

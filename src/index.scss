@@ -1,0 +1,213 @@
+$primary: #1878a8;
+$danger: #ff5b57;
+$card-bg: #222;
+$card-radius: 14px;
+$item-radius: 8px;
+
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
+.app {
+  height: 100%;
+  background-color: #000;
+  position: relative;
+}
+#stage {
+  position: absolute;
+}
+#room-title {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+  font-size: 28px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.move {
+  transition: transform 0.3s ease-out, filter 0.3s ease-out;
+
+  &[data-position="right"],
+  &[data-position="left"],
+  &[data-position="top"],
+  &[data-position="bottom"] {
+    filter: opacity(0);
+  }
+
+  &[data-position="right"] {
+    transform: translate(100%, 0);
+  }
+  &[data-position="bottom"] {
+    transform: translate(0, 80px);
+  }
+  &[data-position="top"] {
+    transform: translate(0, -80px);
+  }
+  &[data-position="origin"] {
+    transform: translate(0, 0);
+    filter: opacity(1);
+  }
+}
+.collapse {
+  position: relative;
+  transition: height 0.3s ease-out, filter 0.3s ease-out;
+  overflow: hidden;
+  &[data-toggle="collapse"] {
+    filter: opacity(0);
+  }
+  &[data-toggle="open"][data-position="origin"] {
+    filter: opacity(1);
+  }
+  .collapse-inner {
+    position: absolute;
+  }
+}
+
+.control-panel {
+  position: absolute;
+  height: 100%;
+  right: 0;
+  top: 0;
+  width: 300px;
+  overflow: hidden;
+  display: none;
+}
+
+.btn {
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  min-width: 80px;
+  padding: 0 15px;
+  border-radius: $item-radius;
+  font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: -2px 2px 4px #0003;
+  &:disabled {
+    cursor: not-allowed;
+  }
+  &.btn-primary {
+    background-color: $primary;
+  }
+  &.btn-danger {
+    background-color: $danger;
+  }
+  &.btn-dark {
+    background-color: rgb(83, 83, 83);
+  }
+}
+
+.player-panel {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-radius: $card-radius;
+}
+
+.btns {
+  display: flex;
+  > .btn {
+    margin-left: 10px;
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition-property: filter, transform;
+  transition-duration: .3s;
+  &[data-toggle="hide"] {
+    filter: opacity(0);
+    transform: translate(0, 200px) scale(.5);
+    transition-timing-function: ease-in;
+  }
+  &[data-toggle="open"] {
+    filter: opacity(1);
+    transform: translate(0, 0) scale(1);
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}
+.modal-content {
+  background-color: $card-bg;
+  border-radius: $card-radius;
+  width: 300px;
+  color: white;
+  .modal-header {
+    font-size: 22px;
+    padding: 10px 20px;
+    text-shadow: -2px 2px 4px #0003;
+  }
+  .modal-body {
+    padding: 20px;
+  }
+  .modal-footer {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.form-line {
+  padding: 10px 0;
+  > label {
+    margin-bottom: 10px;
+    display: block;
+  }
+  .input-wrapper {
+    position: relative;
+    background-color: #fff3;
+    box-shadow: -2px 2px 4px #0003;
+    border-radius: $item-radius;
+    transition: background-color 0.3s ease-out;
+    overflow: hidden;
+    &::after {
+      content: "";
+      position: absolute;
+      display: block;
+      width: 0%;
+      transition: width 0.3s ease-out;
+      height: 4px;
+      background-color: #05557e;
+      bottom: 0;
+    }
+    &:focus-within {
+      input {
+        outline: none;
+      }
+      background-color: #fffA;
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+  input {
+    font-size: 18px;
+    border: none;
+    padding: 10px;
+    background-color: transparent;
+    border-radius: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

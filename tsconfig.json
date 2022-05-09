@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "moduleResolution": "node",
+    "outDir": "./dist/",
+    "sourceMap": true
+  },
+  "include": [
+    "src/model/**/*.ts",
+    "src/view/*.ts",
+    "src/controller/*.ts",
+
+    "src/item/*.ts",
+    "src/interceptor/*.ts",
+    "src/animation/*.ts",
+
+    "src/util/*.ts",
+    "src/index.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
