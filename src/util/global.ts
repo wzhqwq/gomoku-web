@@ -1,8 +1,9 @@
-import { AnimationMixer, Texture, TextureLoader } from "three"
+import { AnimationMixer, Object3D, Texture, TextureLoader } from "three"
 import GameController from "../controller/GameController"
 import BoardInfoTexture from "../item/BoardInfoTexture"
 import Setting from "../model/local/Setting"
 import Stage from "../view/Stage"
+import PointerHandlers from "./pointerHandlers"
 
 type BoardFaceInfo = {
   size: number
@@ -23,6 +24,7 @@ class Global {
   )
 
   public mixers: Map<string, AnimationMixer> = new Map()
+  public pointerHandlers: PointerHandlers = new PointerHandlers()
 
   constructor() {
     let loader = new TextureLoader()

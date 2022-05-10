@@ -20,6 +20,8 @@ export default class RoomController {
       new Room({
         size: 20,
         gameName: "asdfasasdfdsf",
+        isGameStarted: true,
+        isGameOver: true,
         users: [
           {
             username: "adssdafsdffas"
@@ -31,6 +33,7 @@ export default class RoomController {
       new Room({
         size: 15,
         gameName: "retwrarfw",
+        isGameStarted: false,
         users: [
           {
             username: "adssdafsdffas"

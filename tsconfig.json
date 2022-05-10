@@ -14,6 +14,7 @@
     "src/item/*.ts",
     "src/interceptor/*.ts",
     "src/animation/*.ts",
+    "src/event/*.ts",
 
     "src/util/*.ts",
     "src/index.ts"

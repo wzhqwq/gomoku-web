@@ -8,6 +8,6 @@ export default class BlinkAnimationClip extends AnimationClip {
 
 class BlinkTrack extends NumberKeyframeTrack {
   constructor(duration: number, nodeFinder: string) {
-    super(nodeFinder + ".material.opacity", [0, duration / 2, duration], [0, 0.2, 1], InterpolateSmooth)
+    super(nodeFinder + ".material.opacity", [0, duration / 2, duration], [1, 0.8, 0], InterpolateSmooth)
   }
 }

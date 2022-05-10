@@ -22,6 +22,9 @@ export default class RoomList extends Group {
           G.mixers.get(t.uuid).stopAllAction()
           G.mixers.delete(t.uuid)
         }
+        if (G.pointerHandlers.has(t.uuid)) {
+          G.pointerHandlers.delete(t.uuid)
+        }
       }
     })
     this.remove(...this.children)
@@ -31,12 +34,12 @@ export default class RoomList extends Group {
   }
 
   public rearrange(): void {
-    let colNum = Math.floor((this._width + 40) / 360)
-    let startX = -this._width / 2 + 10, startY = this._height / 2 - 120
+    let colNum = Math.floor((this._width + 40) / 380)
+    let startX = -this._width / 2 + 10, startY = this._height / 2 - 140
     for (let i = 0; i < this.children.length; i++) {
       this.children[i].position.set(
-        startX + (i % colNum) * 360,
-        startY - Math.floor(i / colNum) * 120,
+        startX + (i % colNum) * 380,
+        startY - Math.floor(i / colNum) * 140,
         0
       )
     }

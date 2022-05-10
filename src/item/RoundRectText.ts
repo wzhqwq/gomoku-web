@@ -8,6 +8,7 @@ type RoundRectTextOptions = {
   bgColor?: string
   variant?: "filled" | "outlined"
   minWidth?: number
+  exactWidth?: number
 }
 
 export default class RoundRectText extends Group {
@@ -23,19 +24,20 @@ export default class RoundRectText extends Group {
     bgColor = '#222',
     variant = 'filled',
     minWidth = Infinity,
+    exactWidth = null,
   }: RoundRectTextOptions) {
     super()
 
     let canvas = document.createElement('canvas')
     let ctx = canvas.getContext('2d')
     ctx.font = `${size}px sans-serif`
-    content = cutText(ctx, content, minWidth - 20)
+    content = cutText(ctx, content, Math.min(exactWidth ?? Infinity, minWidth) - 20)
     const {
       width,
       actualBoundingBoxAscent,
       actualBoundingBoxDescent
     } = ctx.measureText(content)
-    this.width = canvas.width = width + 20
+    this.width = canvas.width = exactWidth ?? (width + 20)
     this.height = canvas.height = actualBoundingBoxAscent + actualBoundingBoxDescent + 20
 
     switch (variant) {
@@ -52,7 +54,7 @@ export default class RoundRectText extends Group {
     }
     ctx.fillStyle = color
     ctx.font = `${size}px sans-serif`
-    ctx.fillText(content, 10, actualBoundingBoxAscent + 10)
+    ctx.fillText(content, exactWidth ? (exactWidth - width) / 2 : 10, actualBoundingBoxAscent + 10)
 
     const texture = new CanvasTexture(canvas)
     const rect = new PlaneBufferGeometry(this.width, this.height)
