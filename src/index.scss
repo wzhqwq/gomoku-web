@@ -42,16 +42,16 @@ body {
   }
 
   &[data-position="right"] {
-    transform: translate(100%, 0);
+    transform: translate(100%, 0px);
   }
   &[data-position="bottom"] {
-    transform: translate(0, 80px);
+    transform: translate(0%, 80px);
   }
   &[data-position="top"] {
-    transform: translate(0, -80px);
+    transform: translate(0%, -80px);
   }
   &[data-position="origin"] {
-    transform: translate(0, 0);
+    transform: translate(0%, 0px);
     filter: opacity(1);
   }
 }
@@ -153,6 +153,7 @@ body {
   border-radius: $card-radius;
   width: 300px;
   color: white;
+  box-shadow: -2px 2px 4px #0003;
   .modal-header {
     font-size: 22px;
     padding: 10px 20px;

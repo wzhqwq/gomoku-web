@@ -1,5 +1,5 @@
 import { CanvasTexture } from "three"
-import Player from "../model/base/Player"
+import Player from "@model/base/Player"
 
 export default class VersusTexture extends CanvasTexture {
   constructor(player1: Player, player2?: Player) {

@@ -1,7 +1,7 @@
 import { CanvasTexture, Group, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from "three"
-import { cutText, fillRoundRect, strokeRoundRect } from "../util/utils"
+import { cutText, fillRoundRect, strokeRoundRect } from "../../util/utils"
 
-type RoundRectTextOptions = {
+export type RoundRectTextOptions = {
   content: string
   size?: number
   color?: string

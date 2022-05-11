@@ -1,6 +1,6 @@
 import { Group, Mesh } from "three"
-import Room from "../model/base/Room"
-import G from "../util/global"
+import Room from "@model/base/Room"
+import G from "@util/global"
 import RoomInfo from "./RoomInfo"
 
 export default class RoomList extends Group {

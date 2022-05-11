@@ -1,19 +1,26 @@
 import * as $ from "jquery"
-import Room from "../model/base/Room"
-import G from "../util/global"
-import Stage from "../view/Stage"
+import Room from "@model/base/Room"
+import G from "@util/global"
+import Stage from "@view/Stage"
+import NewRoom from "@view/NewRoom"
+import RoomSelectEvent from "@event/RoomSelectEvent"
+import eventDispatcher from "@event/eventDispatcher"
+import { RoomCreateEvent, RoomFetchEvent } from "@event/emptyEvents"
 
 export default class RoomController {
   private rooms: Room[]
 
   // views
   private stage: Stage = G.stage
+  private newRoom: NewRoom = G.newRoom
 
   constructor() {
-    this.stage.bindRoomRefresh(this.fetchRooms.bind(this))
+    eventDispatcher.listen("selectRoom", this.enterRoom)
+    eventDispatcher.listen("createRoom", this.createRoom)
+    eventDispatcher.listen("fetchRooms", this.fetchRooms)
   }
 
-  public startRoom(): void {
+  public startRoom = () => {
     // this.fetchRooms()
     this.stage.enterRoomPage()
     this.stage.rooms = [
@@ -43,10 +50,10 @@ export default class RoomController {
     ]
   }
 
-  private fetchRooms(): void {
+  public fetchRooms = () => {
     this.stage.roomListLoading = true
     $.get({
-      url: G.setting.serverUrl + "/game/listGames",
+      url: "http://" + G.setting.serverUrl + "/game/listGames",
       headers: {
         "Cross-Origin-Allow-Origin": "*"
       }
@@ -56,5 +63,16 @@ export default class RoomController {
         this.stage.roomListLoading = false
         this.stage.rooms = this.rooms
       })
+  }
+
+  public createRoom = () => {
+    this.newRoom.ask().then(roomName => {
+      this.newRoom.hideModal()
+      if (roomName) {
+      }
+    })
+  }
+
+  public enterRoom = (room: RoomSelectEvent) => {
   }
 }

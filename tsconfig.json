@@ -4,15 +4,30 @@
     "module": "es6",
     "moduleResolution": "node",
     "outDir": "./dist/",
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@model/*": ["src/model/*"],
+      "@view/*": ["src/view/*"],
+      "@controller/*": ["src/controller/*"],
+
+      "@item/*": ["src/item/*"],
+      "@interceptor/*": ["src/interceptor/*"],
+      "@texture/*": ["src/texture/*"],
+      "@animation/*": ["src/animation/*"],
+      "@event/*": ["src/event/*"],
+
+      "@util/*": ["src/util/*"],
+    }
   },
   "include": [
     "src/model/**/*.ts",
     "src/view/*.ts",
     "src/controller/*.ts",
 
-    "src/item/*.ts",
+    "src/item/**/*.ts",
     "src/interceptor/*.ts",
+    "src/texture/*.ts",
     "src/animation/*.ts",
     "src/event/*.ts",
 

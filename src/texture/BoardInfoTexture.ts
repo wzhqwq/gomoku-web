@@ -1,5 +1,5 @@
 import { CanvasTexture } from "three"
-import { fillRoundRect } from "../util/utils"
+import { fillRoundRect } from "@util/utils"
 
 export default class BoardInfoTexture extends CanvasTexture {
   constructor(size: number, color: string) {

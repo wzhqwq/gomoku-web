@@ -44,7 +44,7 @@
         >
           <div class="collapse-inner">
             <div class="btns">
-              <button class="btn btn-danger" id="btn-abort">终止</button>
+              <button class="btn btn-danger" id="btn-abort">离开</button>
               <button class="btn btn-primary" id="btn-retract">悔棋</button>
             </div>
           </div>
@@ -94,6 +94,29 @@
                 </button>
                 <button class="btn btn-dark" id="btn-cancel-nickname">
                   退出
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal" data-toggle="hide" id="new-room-modal" style="display: none;">
+          <div class="modal-content">
+            <div class="modal-header">创建房间</div>
+            <div class="modal-body">
+              <div class="form-line">
+                <label for="new-room">房间名称</label>
+                <div class="input-wrapper">
+                  <input type="text" id="new-room" />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="btns">
+                <button class="btn btn-primary" id="btn-confirm-new-room">
+                  创建房间
+                </button>
+                <button class="btn btn-dark" id="btn-cancel-new-room">
+                  取消
                 </button>
               </div>
             </div>

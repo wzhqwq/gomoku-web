@@ -1,5 +1,5 @@
 import * as $ from "jquery";
-import Player from "../model/base/Player";
+import Player from "@model/base/Player";
 import Collapse from "./Collapse";
 
 export default class ControlPanel {

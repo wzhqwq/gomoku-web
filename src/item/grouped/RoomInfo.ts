@@ -1,18 +1,20 @@
-import { Group, Mesh, MeshBasicMaterial, PlaneBufferGeometry, AnimationAction, AnimationMixer, LoopPingPong, MeshMatcapMaterial } from "three"
-import Room from "../model/base/Room"
-import G from "../util/global"
-import RoundRectText from "./RoundRectText"
+import { Group, Mesh, MeshBasicMaterial, PlaneBufferGeometry, AnimationMixer, LoopPingPong, MeshMatcapMaterial } from "three"
+import Room from "@model/base/Room"
+import G from "@util/global"
+import RoundRectText from "@item/UI/RoundRectText"
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader"
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry"
-import BlinkAnimationClip from "../animation/BlinkAnimationClip"
-import Player from "../model/base/Player"
-import eventDispatcher from "../util/EventDispatcher"
-import RoomSelectEvent from "../event/RoomSelectEvent"
+import BlinkAnimationClip from "@animation/BlinkAnimationClip"
+import Player from "@model/base/Player"
+import eventDispatcher from "@event/eventDispatcher"
+import RoomSelectEvent from "@event/RoomSelectEvent"
+import RoundRectButton from "@item/UI/RoundRectButton"
 
 export default class RoomInfo extends Group {
-  constructor(room: Room, createdBySelf: boolean = false) {
+  constructor(room: Room, createBySelf: boolean = false) {
     super()
 
+    // 绘制棋盘预览
     let boardFaceTexture = G.boardFaces.find(
       face => face.size === room.size
     ).texture
@@ -25,6 +27,7 @@ export default class RoomInfo extends Group {
     boardFace.position.set(60, 60, 0)
     this.add(boardFace)
 
+    // 绘制房间名称
     let gameName = new RoundRectText({ content: room.gameName, size: 26, minWidth: 220 })
     gameName.position.set(
       130,
@@ -33,6 +36,7 @@ export default class RoomInfo extends Group {
     )
     this.add(gameName)
 
+    // 绘制玩家信息
     let playersInfo = new PlayersInfo(room.players)
     playersInfo.position.set(
       130,
@@ -41,8 +45,12 @@ export default class RoomInfo extends Group {
     )
     this.add(playersInfo)
 
+    // 绘制操作区域
+    let hasMe = room.players.some(p => p.name === G.me.name)
+
     let bottom: RoundRectText
-    if (!room.isGameStarted && !createdBySelf) {
+    if (!room.isGameStarted || hasMe) {
+      // 可以加入
       let requesting = new RoundRectText({
         content: "请求中...",
         size: 16,
@@ -61,40 +69,47 @@ export default class RoomInfo extends Group {
       requesting.visible = false
       this.add(requesting)
       
-      bottom = new RoundRectText({
-        content: "加入游戏",
+      bottom = new RoundRectButton({
+        content: hasMe ? "重新加入游戏" : "加入游戏",
         size: 16,
         bgColor: "#1878a8",
         exactWidth: 220,
-      })
-      G.pointerHandlers.set(bottom.mesh.uuid, {
-        target: bottom,
-        callback: (type: string) => {
-          if (type === "click") {
-            bottom.visible = false
-            requesting.visible = true
-            requestingAction.play()
-            G.mixers.set(requesting.mesh.uuid, requestingMixer)
-            eventDispatcher.dispatch(RoomSelectEvent.TYPE, new RoomSelectEvent(
-              room,
-              (success: boolean) => {
-                requestingAction.stop()
-                G.mixers.delete(requesting.mesh.uuid)
-                requesting.visible = false
-                if (!success) {
-                  bottom.visible = true
-                }
+        onClick: () => {
+          bottom.visible = false
+          requesting.visible = true
+          requestingAction.play()
+          G.mixers.set(requesting.mesh.uuid, requestingMixer)
+          eventDispatcher.dispatch("selectRoom", new RoomSelectEvent(
+            room,
+            (success: boolean) => {
+              requestingAction.stop()
+              G.mixers.delete(requesting.mesh.uuid)
+              requesting.visible = false
+              if (!success) {
+                bottom.visible = true
               }
-            ))
-          }
-          if (type === "hover") {
-            bottom.mesh.scale.set(1.05, 1.05, 1.05)
-          }
-          if (type === "leave") {
-            bottom.mesh.scale.set(1, 1, 1)
-          }
+            }
+          ))
         }
       })
+    }
+    else if (createBySelf) {
+      let waiting = new RoundRectText({
+        content: "等待玩家加入...",
+        size: 16,
+        bgColor: "#092f42",
+        color: "#ddd",
+        exactWidth: 220,
+      })
+      waiting.position.set(
+        130,
+        110 - gameName.height - playersInfo.height - waiting.height,
+        0
+      )
+      let waitingMixer = new AnimationMixer(waiting.mesh)
+      let waitingAction = waitingMixer.clipAction(new BlinkAnimationClip(1))
+      waitingAction.setLoop(LoopPingPong, Infinity)
+      this.add(waiting)
     }
     else {
       bottom = new RoundRectText({

@@ -1,12 +1,16 @@
-import Room from "../model/base/Room"
+import Room from "@model/base/Room"
+import BaseEvent from "./BaseEvent"
 
-export default class RoomSelectEvent {
-  public static TYPE = Symbol("RoomSelectEvent")
-  public roomSelected: Room
-  public finishCallback: (success: boolean) => void
+export default class RoomSelectEvent implements BaseEvent {
+  public TYPE = Symbol("RoomSelectEvent")
+  public detail: RoomSelectEventDetail
 
   constructor(roomSelected: Room, finishCallback: (success: boolean) => void) {
-    this.roomSelected = roomSelected
-    this.finishCallback = finishCallback
+    this.detail = { roomSelected, finishCallback }
   }
+}
+
+type RoomSelectEventDetail = {
+  roomSelected: Room
+  finishCallback: (success: boolean) => void
 }

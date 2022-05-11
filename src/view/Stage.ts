@@ -1,12 +1,12 @@
 import * as $ from "jquery"
 import { AmbientLight, Clock, PerspectiveCamera, Raycaster, Renderer, Scene, WebGLRenderer } from "three"
-import RoomInfo from "../item/RoomInfo"
-import RoomList from "../item/RoomList"
-import Game from "../model/base/Game"
-import Room from "../model/base/Room"
-import eventDispatcher from "../util/EventDispatcher"
-import G from "../util/global"
-import RoomSelectEvent from "../event/RoomSelectEvent"
+import RoomList from "@item/grouped/RoomList"
+import Room from "@model/base/Room"
+import eventDispatcher from "@event/eventDispatcher"
+import G from "@util/global"
+import RoomSelectEvent from "@event/RoomSelectEvent"
+import RoomController from "@controller/RoomController"
+import { RoomCreateEvent, RoomFetchEvent } from "@event/emptyEvents"
 
 export default class Stage {
   // DOM
@@ -34,13 +34,18 @@ export default class Stage {
     this.roomCreateButton = $("#btn-create")
     this.canvas = $("#stage")
 
+    // DOM事件
+    this.roomRefreshButton.on("click", () => eventDispatcher.dispatch("fetchRooms", new RoomFetchEvent()))
+    this.roomCreateButton.on("click", () => eventDispatcher.dispatch("createRoom", new RoomCreateEvent()))
+
+    // 全局DOM事件
     window.addEventListener("resize", this.handleResize.bind(this))
     window.addEventListener("blur", this.handleWindowBlur.bind(this))
     window.addEventListener("focus", this.handleWindowFocus.bind(this))
     window.addEventListener("pointermove", this.handlePointerMove.bind(this))
     window.addEventListener("pointerdown", this.handlePointerDown.bind(this))
 
-    // Three.js init
+    // Three.js场景初始化
     this.scene = new Scene()
     this.renderer = new WebGLRenderer({
       canvas: this.canvas[0],
@@ -58,8 +63,8 @@ export default class Stage {
     this.setLight()
 
     this.handleResize()
-    
 
+    // 开始渲染
     this.renderRunning = true
     this.render()
   }
@@ -78,6 +83,10 @@ export default class Stage {
     this.scene.remove(this.roomList)
   }
 
+  public enterGame() {
+    
+  }
+
   public set rooms(rooms: Room[]) {
     this.roomList.rooms = rooms
   }
@@ -85,19 +94,6 @@ export default class Stage {
   public set roomListLoading(loading: boolean) {
     this.roomRefreshButton.text(loading ? "加载中" : "刷新列表")
     this.roomRefreshButton[0].disabled = loading
-  }
-
-  // 事件绑定
-  public bindRoomRefresh(callback: () => void): void {
-    this.roomRefreshButton.on("click", callback)
-  }
-
-  public bindRoomCreate(callback: () => void): void {
-    this.roomCreateButton.on("click", callback)
-  }
-
-  public bindRoomSelect(callback: (e: RoomSelectEvent) => void): void {
-    eventDispatcher.listen(RoomSelectEvent.TYPE, callback)
   }
 
   // 私有方法
