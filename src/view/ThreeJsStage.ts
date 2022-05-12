@@ -4,11 +4,10 @@ import RoomList from "@item/grouped/RoomList"
 import Room from "@model/base/Room"
 import eventDispatcher from "@event/eventDispatcher"
 import G from "@util/global"
-import RoomSelectEvent from "@event/RoomSelectEvent"
-import RoomController from "@controller/RoomController"
 import { RoomCreateEvent, RoomFetchEvent } from "@event/emptyEvents"
+import Stage from "./AbstractStage"
 
-export default class Stage {
+export default class ThreeJsStage implements Stage {
   // DOM
   private roomTitle: JQuery<HTMLDivElement>
   
@@ -83,8 +82,12 @@ export default class Stage {
     this.scene.remove(this.roomList)
   }
 
-  public enterGame() {
+  public enterGame(): void {
     
+  }
+
+  public leaveGame(): void {
+    throw new Error("Method not implemented.")
   }
 
   public set rooms(rooms: Room[]) {

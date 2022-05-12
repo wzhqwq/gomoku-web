@@ -1,17 +1,16 @@
 import * as $ from "jquery"
 import Room from "@model/base/Room"
 import G from "@util/global"
-import Stage from "@view/Stage"
 import NewRoom from "@view/NewRoom"
 import RoomSelectEvent from "@event/RoomSelectEvent"
 import eventDispatcher from "@event/eventDispatcher"
-import { RoomCreateEvent, RoomFetchEvent } from "@event/emptyEvents"
+import AbstractStage from "@view/AbstractStage"
 
 export default class RoomController {
   private rooms: Room[]
 
   // views
-  private stage: Stage = G.stage
+  private stage: AbstractStage = G.stage
   private newRoom: NewRoom = G.newRoom
 
   constructor() {

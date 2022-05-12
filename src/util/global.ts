@@ -3,12 +3,13 @@ import GameController from "@controller/GameController"
 import BoardInfoTexture from "@texture/BoardInfoTexture"
 import Player from "@model/base/Player"
 import Setting from "@model/local/Setting"
-import Stage from "@view/Stage"
+import ThreeJsStage from "@view/ThreeJsStage"
 import PointerHandlers from "./pointerHandlers"
 import NewRoom from "@view/NewRoom"
 import UserInput from "@view/UserInput"
 import Room from "@model/base/Room"
 import RoomController from "@controller/RoomController"
+import AbstractStage from "@view/AbstractStage"
 
 type BoardFaceInfo = {
   size: number
@@ -22,7 +23,7 @@ class Global {
   private _gameController: GameController = null
 
   // views
-  private _stage: Stage = null
+  private _stage: AbstractStage = null
   private _newRoom: NewRoom = null
   private _userInput: UserInput = null
 
@@ -54,9 +55,9 @@ class Global {
     return this._gameController
   }
 
-  public get stage(): Stage {
+  public get stage(): AbstractStage {
     if (this._stage === null) {
-      this._stage = new Stage()
+      this._stage = new ThreeJsStage()
     }
     return this._stage
   }

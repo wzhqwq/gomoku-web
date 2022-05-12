@@ -1,2 +1,2 @@
-export default class RealObject {
+export default interface RealObject {
 }
