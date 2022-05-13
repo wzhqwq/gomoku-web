@@ -1,8 +1,12 @@
 $primary: #1878a8;
+$primary-dark: #05557e;
 $danger: #ff5b57;
 $card-bg: #222;
+$item-bg: #fff2;
 $card-radius: 14px;
 $item-radius: 8px;
+$radio-indicator-height: 4px;
+$radio-indicator-radios: $item-radius + $radio-indicator-height;
 
 body {
   margin: 0;
@@ -104,7 +108,7 @@ body {
     background-color: $danger;
   }
   &.btn-dark {
-    background-color: rgb(83, 83, 83);
+    background-color: $item-bg;
   }
 }
 
@@ -177,7 +181,7 @@ body {
   }
   .input-wrapper {
     position: relative;
-    background-color: #fff3;
+    background-color: $item-bg;
     box-shadow: -2px 2px 4px #0003;
     border-radius: $item-radius;
     transition: background-color 0.3s ease-out;
@@ -189,26 +193,69 @@ body {
       width: 0%;
       transition: width 0.3s ease-out;
       height: 4px;
-      background-color: #05557e;
+      background-color: $primary;
       bottom: 0;
     }
     &:focus-within {
-      input {
-        outline: none;
-      }
-      background-color: #fffA;
+      background-color: #fffb;
       &::after {
         width: 100%;
       }
     }
+    input[type="text"] {
+      font-size: 18px;
+      border: none;
+      padding: 10px;
+      background-color: transparent;
+      border-radius: 0;
+      width: 100%;
+      box-sizing: border-box;
+      color: #fff;
+      transition: color 0.3s ease-out;
+      &:focus {
+        outline: none;
+        color: black;
+      }
+    }
   }
-  input {
-    font-size: 18px;
-    border: none;
-    padding: 10px;
-    background-color: transparent;
-    border-radius: 0;
-    width: 100%;
-    box-sizing: border-box;
+  .radio-wrapper {
+    display: flex;
+    .radio-item {
+      position: relative;
+      border-radius: $item-radius;
+      background-color: $item-bg;
+      margin-right: 10px;
+      box-shadow: -2px 2px 4px #0003;
+      overflow: hidden;
+    }
+    input[type="radio"] {
+      position: absolute;
+      margin: 0;
+      bottom: -$radio-indicator-height;
+      left: -$radio-indicator-height;
+
+      border: $primary $radio-indicator-height solid;
+      border-top-color: transparent;
+
+      height: 100%;
+      width: 100%;
+      box-sizing: content-box;
+
+      border-radius: 0 0 $radio-indicator-radios $radio-indicator-radios;
+      background-color: #fff0;
+      transition: bottom 0.3s ease-out, background-color 0.3s ease-out;
+
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+
+      &:checked {
+        bottom: 0;
+        background-color: #fff1;
+      }
+    }
+    .radio-label {
+      padding: 10px;
+    }
   }
 }

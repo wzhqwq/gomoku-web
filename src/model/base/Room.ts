@@ -1,18 +1,27 @@
+import G from "@util/global";
 import Player from "./Player";
 
 export default class Room {
-  gameName: string
-  players: Player[]
-  isGameStarted: boolean
-  isGameOver: boolean
-  size: number
+  constructor(
+    public gameName: string,
+    public players: Player[],
+    public isGameStarted: boolean,
+    public isGameOver: boolean,
+    public size: number
+  ) {}
 
-  constructor(rawObject: any) {
-    this.gameName = rawObject.gameName
+  public static fromRawObject(rawObject: any) {
     let users = rawObject.users as any[]
-    this.players = users.map(user => Player.fromRawObject(user))
-    this.isGameStarted = rawObject.isGameStarted
-    this.isGameOver = rawObject.isGameOver
-    this.size = rawObject.size
+    return new Room(
+      rawObject.gameName,
+      users.map(user => Player.fromRawObject(user)),
+      rawObject.isGameStarted,
+      rawObject.isGameOver,
+      rawObject.size,
+    )
+  }
+
+  public static createRoom(gameName: string, size: number) {
+    return new Room(gameName, [G.me], false, false, size)
   }
 }

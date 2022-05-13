@@ -24,9 +24,12 @@ export default class WebSocketClient {
 
     this.session.onmessage = (event) => {
       const message = new RawMessage(JSON.parse(event.data))
-      const intercepted = interceptors.reduce((message, interceptor) => 
-        interceptor.intercept(message)
-      , message)
+      const intercepted = interceptors.reduce((message, interceptor) => {
+        if (!message) return
+        if (!interceptor.preferredTypes || interceptor.preferredTypes.includes(message.type)) {
+          return interceptor.intercept(message)
+        }
+      }, message)
       this.sendResolver(intercepted)
     }
   }

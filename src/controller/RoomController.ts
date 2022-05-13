@@ -5,6 +5,7 @@ import NewRoom from "@view/NewRoom"
 import RoomSelectEvent from "@event/RoomSelectEvent"
 import eventDispatcher from "@event/eventDispatcher"
 import AbstractStage from "@view/AbstractStage"
+import WebSocketClient from "@util/WebSocketClient"
 
 export default class RoomController {
   private rooms: Room[]
@@ -20,33 +21,8 @@ export default class RoomController {
   }
 
   public startRoom = () => {
-    // this.fetchRooms()
+    this.fetchRooms()
     this.stage.enterRoomPage()
-    this.stage.rooms = [
-      new Room({
-        size: 20,
-        gameName: "asdfasasdfdsf",
-        isGameStarted: true,
-        isGameOver: true,
-        users: [
-          {
-            username: "adssdafsdffas"
-          }, {
-            username: "adssdafsdffas"
-          }
-        ]
-      }),
-      new Room({
-        size: 15,
-        gameName: "retwrarfw",
-        isGameStarted: false,
-        users: [
-          {
-            username: "adssdafsdffas"
-          }
-        ]
-      })
-    ]
   }
 
   public fetchRooms = () => {
@@ -57,17 +33,21 @@ export default class RoomController {
         "Cross-Origin-Allow-Origin": "*"
       }
     })
-      .then(data => {
-        this.rooms = data.data.map(raw => new Room(raw))
+      .then((data: { data: any[] }) => {
+        this.rooms = data.data.map(raw => Room.fromRawObject(raw))
         this.stage.roomListLoading = false
         this.stage.rooms = this.rooms
       })
   }
 
   public createRoom = () => {
-    this.newRoom.ask().then(roomName => {
+    this.newRoom.ask().then(info => {
       this.newRoom.hideModal()
-      if (roomName) {
+      if (info) {
+        G.WSClient = new WebSocketClient(
+          Room.createRoom(info.roomName, info.size),
+          G.interceptors
+        )
       }
     })
   }

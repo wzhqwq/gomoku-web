@@ -10,6 +10,12 @@ import UserInput from "@view/UserInput"
 import Room from "@model/base/Room"
 import RoomController from "@controller/RoomController"
 import AbstractStage from "@view/AbstractStage"
+import Interceptor from "@interceptor/Interceptor"
+import ErrorInterceptor from "@interceptor/ErrorInterceptor"
+import RawInterceptor from "@interceptor/RawInterceptor"
+import ChessboardInterceptor from "@interceptor/ChessBoardInterceptor"
+import WebSocketClient from "./WebSocketClient"
+import { boardStyles } from "./constants"
 
 type BoardFaceInfo = {
   size: number
@@ -33,6 +39,8 @@ class Global {
   public mixers: Map<string, AnimationMixer> = new Map()
   public pointerHandlers: PointerHandlers = new PointerHandlers()
   
+  public _interceptors: Interceptor[] = null
+
   // 状态
   public setting: Setting = new Setting(
     localStorage.getItem("nickname") || "",
@@ -41,6 +49,8 @@ class Global {
 
   public me: Player = null
   public currentRoom: Room = null
+
+  public WSClient: WebSocketClient = null
 
   public get roomController(): RoomController {
     if (this._roomController === null) {
@@ -85,23 +95,23 @@ class Global {
   }
   public get boardFaces(): BoardFaceInfo[] {
     if (this._boardFaces === null) {
-      this._boardFaces = [
-        {
-          size: 10,
-          color: "#0077cb"
-        }, {
-          size: 15,
-          color: "#af7900"
-        }, {
-          size: 20,
-          color: "#cb002f"
-        }
-      ].map(({ size, color }) => ({
+      this._boardFaces = boardStyles.map(({ size, color }) => ({
         size,
         texture: new BoardInfoTexture(size, color)
       }))
     }
     return this._boardFaces
+  }
+
+  public get interceptors(): Interceptor[] {
+    if (this._interceptors === null) {
+      this._interceptors = [
+        new RawInterceptor(),
+        new ErrorInterceptor(),
+        new ChessboardInterceptor(),
+      ]
+    }
+    return this._interceptors
   }
 }
 

@@ -104,9 +104,26 @@
             <div class="modal-header">创建房间</div>
             <div class="modal-body">
               <div class="form-line">
-                <label for="new-room">房间名称</label>
+                <label for="room-name">房间名称</label>
                 <div class="input-wrapper">
-                  <input type="text" id="new-room" />
+                  <input type="text" id="room-name" />
+                </div>
+              </div>
+              <div class="form-line">
+                <label for="new-room">棋盘大小</label>
+                <div class="radio-wrapper">
+                  <div class="radio-item">
+                    <div class="radio-label">10×10</div>
+                    <input type="radio" name="board-size" value="10" id="board-size-10" />
+                  </div>
+                  <div class="radio-item">
+                    <div class="radio-label">15×15</div>
+                    <input type="radio" name="board-size" value="15" id="board-size-15" />
+                  </div>
+                  <div class="radio-item">
+                    <div class="radio-label">20×20</div>
+                    <input type="radio" name="board-size" value="20" id="board-size-20" />
+                  </div>
                 </div>
               </div>
             </div>
