@@ -6,6 +6,7 @@ export default class ErrorInterceptor implements Interceptor {
   preferredTypes: string[] = ["error"]
   intercept(message: BaseMessage): ErrorMessage | void {
     if (!(message instanceof ErrorMessage)) return
+    console.log("WS Error: " + message.detail)
     switch (message.detail) {
 
     }

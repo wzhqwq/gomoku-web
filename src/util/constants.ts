@@ -10,3 +10,6 @@ export const boardStyles = [
     color: "#cb002f"
   }
 ]
+
+export const primaryColor = "#1878a8"
+export const primaryDarkColor = "#092f42"

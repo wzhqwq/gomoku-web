@@ -2,6 +2,7 @@ import { Group, Mesh } from "three"
 import Room from "@model/base/Room"
 import G from "@util/global"
 import RoomInfo from "./RoomInfo"
+import { removeResources } from "@util/utils"
 
 export default class RoomList extends Group {
   private _width: number
@@ -14,19 +15,7 @@ export default class RoomList extends Group {
   }
 
   public set rooms(rooms: Room[]) {
-    this.traverse(item => {
-      if (item instanceof Mesh) {
-        let t = item as Mesh
-        t.geometry.dispose()
-        if (G.mixers.has(t.uuid)) {
-          G.mixers.get(t.uuid).stopAllAction()
-          G.mixers.delete(t.uuid)
-        }
-        if (G.pointerHandlers.has(t.uuid)) {
-          G.pointerHandlers.delete(t.uuid)
-        }
-      }
-    })
+    removeResources(this)
     this.remove(...this.children)
     if (rooms.length === 0) return
     this.add(...rooms.map(room => new RoomInfo(room)))

@@ -1,3 +1,6 @@
+import { Mesh, Object3D } from "three"
+import G from "./global"
+
 export function fillRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
   drawRoundRectPath(ctx, x, y, width, height, radius)
   ctx.fill()
@@ -37,4 +40,21 @@ export function cutText(ctx: CanvasRenderingContext2D, text: string, maxWidth: n
     }
   }
   return text.substring(0, l - 1) + ellipsis
+}
+
+export function removeResources(obj: Object3D) {
+  obj.traverse(item => {
+    if (item instanceof Mesh) {
+      let t = item as Mesh
+      t.geometry.dispose()
+      if (G.mixers.has(t.uuid)) {
+        let mixer = G.mixers.get(t.uuid)
+        mixer.stopAllAction().uncacheRoot(t)
+        G.mixers.delete(t.uuid)
+      }
+      if (G.pointerHandlers.has(t.uuid)) {
+        G.pointerHandlers.delete(t.uuid)
+      }
+    }
+  })
 }

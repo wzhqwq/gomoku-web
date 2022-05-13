@@ -30,7 +30,8 @@ export default class WebSocketClient {
           return interceptor.intercept(message)
         }
       }, message)
-      this.sendResolver(intercepted)
+      this.sendResolver?.(intercepted)
+      this.sendResolver = null
     }
   }
 

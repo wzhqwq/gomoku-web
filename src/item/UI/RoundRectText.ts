@@ -1,5 +1,8 @@
-import { CanvasTexture, Group, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from "three"
+import BlinkAnimationClip from "@animation/BlinkAnimationClip"
+import { AnimationAction, AnimationMixer, BufferGeometry, CanvasTexture, Group, LoopOnce, Material, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from "three"
 import { cutText, fillRoundRect, strokeRoundRect } from "../../util/utils"
+import AnimatedComponent from "./AnimatedComponent"
+import BaseComponent from "./BaseComponent"
 
 export type RoundRectTextOptions = {
   content: string
@@ -11,11 +14,16 @@ export type RoundRectTextOptions = {
   exactWidth?: number
 }
 
-export default class RoundRectText extends Group {
-  public readonly width: number
-  public readonly height: number
+export default class RoundRectText extends BaseComponent {
+  public width: number
+  public height: number
 
   public readonly mesh: Mesh
+  public readonly animationMixer: AnimationMixer
+
+  private options: RoundRectTextOptions
+  private canvas: HTMLCanvasElement
+  private textPos: { x: number, y: number }
 
   constructor({
     content,
@@ -28,42 +36,61 @@ export default class RoundRectText extends Group {
   }: RoundRectTextOptions) {
     super()
 
-    let canvas = document.createElement('canvas')
-    let ctx = canvas.getContext('2d')
+    this.options = { content, size, color, bgColor, variant, minWidth, exactWidth }
+    this.canvas = document.createElement('canvas')
+
+    this.buildMesh();
+  }
+
+  protected calculateSize(): void {
+    const { size, exactWidth, minWidth } = this.options
+    const ctx = this.canvas.getContext('2d')
+
     ctx.font = `${size}px sans-serif`
-    content = cutText(ctx, content, Math.min(exactWidth ?? Infinity, minWidth) - 20)
+
+    let content = cutText(ctx, this.options.content, Math.min(exactWidth ?? Infinity, minWidth) - 20)
     const {
       width,
       actualBoundingBoxAscent,
       actualBoundingBoxDescent
     } = ctx.measureText(content)
-    this.width = canvas.width = exactWidth ?? (width + 20)
-    this.height = canvas.height = actualBoundingBoxAscent + actualBoundingBoxDescent + 20
+
+    this.width = this.canvas.width = exactWidth ?? (width + 20)
+    this.height = this.canvas.height = actualBoundingBoxAscent + actualBoundingBoxDescent + 20
+    this.textPos = {
+      x: exactWidth ? (exactWidth - width) / 2 : 10,
+      y: actualBoundingBoxAscent + 10
+    }
+  }
+
+  protected getMaterial(): Material {
+    const { content, size, color, bgColor, variant } = this.options
+    const ctx = this.canvas.getContext('2d')
 
     switch (variant) {
       case 'filled':
         ctx.fillStyle = bgColor
-        fillRoundRect(ctx, 0, 0, canvas.width, canvas.height, 12)
+        fillRoundRect(ctx, 0, 0, this.width, this.height, 12)
         break
       case 'outlined':
         ctx.strokeStyle = bgColor
         ctx.lineWidth = 2
         ctx.setLineDash([3, 3])
-        strokeRoundRect(ctx, 2, 2, canvas.width - 4, canvas.height - 4, 12)
+        strokeRoundRect(ctx, 2, 2, this.width - 4, this.height - 4, 12)
         break
     }
     ctx.fillStyle = color
     ctx.font = `${size}px sans-serif`
-    ctx.fillText(content, exactWidth ? (exactWidth - width) / 2 : 10, actualBoundingBoxAscent + 10)
+    ctx.fillText(content, this.textPos.x, this.textPos.y)
 
-    const texture = new CanvasTexture(canvas)
-    const rect = new PlaneBufferGeometry(this.width, this.height)
-    const material = new MeshBasicMaterial({
+    const texture = new CanvasTexture(this.canvas)
+    return new MeshBasicMaterial({
       map: texture,
       transparent: true
     })
-    this.mesh = new Mesh(rect, material)
-    this.mesh.position.set(this.width / 2, this.height / 2, 0)
-    this.add(this.mesh)
+  }
+  
+  protected getGeometry(): BufferGeometry {
+    return new PlaneBufferGeometry(this.width, this.height)
   }
 }
