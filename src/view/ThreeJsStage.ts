@@ -57,7 +57,7 @@ export default class ThreeJsStage implements Stage {
       1,
       1000
     )
-    this.camera.position.set(0, 0, 900)
+    this.camera.position.set(0, 0, 600)
     this.camera.lookAt(0, 0, 0)
     this.setLight()
 
@@ -72,7 +72,7 @@ export default class ThreeJsStage implements Stage {
   public enterRoomPage(): void {
     this.roomTitle[0].dataset.position = "origin"
     if (!this.roomList) {
-      this.roomList = new RoomList(this.canvas.width() * 1.2, this.canvas.height() * 1.2)
+      this.roomList = new RoomList(this.canvas.width(), this.canvas.height())
     }
     this.scene.add(this.roomList)
   }
@@ -109,7 +109,7 @@ export default class ThreeJsStage implements Stage {
     this.renderer.setSize(width, height)
     
     if (this.roomList) {
-      this.roomList.setViewSize(width * 1.2, height * 1.2)
+      this.roomList.setViewSize(width, height)
     }
 
     if (!this.renderRunning) {

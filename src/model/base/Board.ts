@@ -8,4 +8,8 @@ export default class Board implements RealObject {
     this.matrix = matrix
     this.myChess = myChess
   }
+
+  public static fromRawObject(rawObject: any): Board {
+    return new Board(rawObject.chessboard, rawObject.myChess)
+  }
 }

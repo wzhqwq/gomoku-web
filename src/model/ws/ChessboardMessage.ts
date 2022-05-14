@@ -1,17 +1,20 @@
 import Board from "@model/base/Board"
 import BaseMessage from "./BaseMessage"
+import BaseRequest from "./BaseRequest"
 
-export default class ChessboardMessage implements BaseMessage {
-  code: number
-  type: string
+export default class ChessboardMessage implements BaseMessage, BaseRequest {
+  public readonly type: string = "chessboard"
 
-  board: Board
-  isMeNow: boolean
+  constructor(
+    public readonly board: Board,
+    public readonly isMeNow: boolean
+  ) {}
 
-  constructor(object: any) {
-    this.code = object.code
-    this.type = object.type
-    this.board = new Board(object.chessboard, object.myChess)
-    this.isMeNow = object.isMeNow
+  public static fromRawObject(rawObject: any): ChessboardMessage {
+    return new ChessboardMessage(Board.fromRawObject(rawObject), rawObject.isMeNow)
+  }
+
+  public toJson(): string {
+    throw new Error("Method not implemented.")
   }
 }

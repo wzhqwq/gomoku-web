@@ -1,9 +1,8 @@
 import BaseMessage from "./BaseMessage"
 
 export default class ErrorMessage implements BaseMessage {
-  code: number = -1
-  type: string = "error"
-  detail: string
+  public readonly type: string = "error"
+  public readonly detail: string
 
   constructor (object: any) {
     this.detail = object

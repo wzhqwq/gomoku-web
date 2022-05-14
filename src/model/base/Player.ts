@@ -9,7 +9,7 @@ export default class Player {
     this.chessType = chessType
   }
 
-  static fromRawObject(rawObject: any): Player {
+  public static fromRawObject(rawObject: any): Player {
     return new Player(rawObject.username, rawObject.online, rawObject.chessType)
   }
 }

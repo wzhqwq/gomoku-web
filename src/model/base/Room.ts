@@ -10,7 +10,7 @@ export default class Room {
     public size: number
   ) {}
 
-  public static fromRawObject(rawObject: any) {
+  public static fromRawObject(rawObject: any): Room {
     let users = rawObject.users as any[]
     return new Room(
       rawObject.gameName,
