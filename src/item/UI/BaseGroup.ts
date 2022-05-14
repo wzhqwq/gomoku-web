@@ -70,12 +70,14 @@ export default class BaseGroup extends Group
   }
 
   public slideTo(x: number, y: number, z: number): Promise<void> {
+    let end = new Vector3(x, y, z)
     if (!this.slideAnimationClip) {
-      this.slideEnd = new Vector3(x, y, z)
+      if (this.position.equals(end)) return Promise.resolve()
+      this.slideEnd = end
       this.doSlide()
     }
     else {
-      this.latestSlideEnd = new Vector3(x, y, z)
+      this.latestSlideEnd = end
     }
     
     return new Promise(res => {
@@ -95,11 +97,11 @@ export default class BaseGroup extends Group
     if (!this.slideAnimationClip) return
     this.animationMixer.uncacheClip(this.slideAnimationClip)
     this.slideAnimationClip = null
-    this.slideResolvers.forEach(res => res())
     this.position.copy(this.slideEnd)
     if (this.latestSlideEnd) {
       this.slideEnd = this.latestSlideEnd
       this.doSlide()
     }
+    this.slideResolvers.forEach(res => res())
   }
 }

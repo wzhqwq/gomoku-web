@@ -85,11 +85,17 @@ export default class RoomController {
       }
       this.newRoom.hideModal()
       this.fetchRooms().then(rooms => {
+        this.doEnterRoom(rooms.find(room => room.roomName === info.roomName))
       })
     })
   }
 
-  public enterRoom = (room: SelectRoomEvent) => {
+  public enterRoom = (e: SelectRoomEvent) => {
+    this.doEnterRoom(e.detail.roomSelected)
+  }
+
+  private async doEnterRoom(room: Room) {
+    this.stage.focusRoom(room)
   }
 
   private updateSetting = async (): Promise<boolean> => {

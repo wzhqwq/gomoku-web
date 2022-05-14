@@ -26,6 +26,7 @@ export default class ThreeJsStage implements Stage {
 
   private renderRunning: boolean
   private lastHoveredUuid: string
+  private rearrangePromise: Promise<void>
 
   constructor() {
     this.roomTitle = $("#room-title")
@@ -73,14 +74,19 @@ export default class ThreeJsStage implements Stage {
     this.roomTitle[0].dataset.position = "origin"
     if (!this.roomList) {
       this.roomList = new RoomList()
-      this.setRoomList(this.canvas.width(), this.canvas.height())
+      this.scene.add(this.roomList)
     }
-    this.scene.add(this.roomList)
+    this.setRoomList(this.canvas.width(), this.canvas.height())
   }
 
   public leaveRoomPage(): void {
     this.roomTitle[0].dataset.position = "top"
-    this.scene.remove(this.roomList)
+  }
+
+  public async focusRoom(room: Room): Promise<void> {
+    this.roomTitle[0].dataset.position = "top"
+    await this.rearrangePromise
+    await this.roomList.focus(room.roomName)
   }
 
   public enterGame(): void {
@@ -170,7 +176,7 @@ export default class ThreeJsStage implements Stage {
 
   private setRoomList(width: number, height: number): void {
     if (this.roomList) {
-      this.roomList.setViewSize(width, height)
+      this.rearrangePromise = this.roomList.setViewSize(width, height)
       if (height > 700) {
         if (this.roomList.position.z === 0) {
           this.roomList.slideTo(0, 0, -80)

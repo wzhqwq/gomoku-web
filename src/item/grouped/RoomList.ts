@@ -44,18 +44,34 @@ export default class RoomList extends BaseGroup {
     this.rearrange()
   }
 
-  public rearrange(): void {
+  public async rearrange(): Promise<void> {
     let colNum = Math.floor((this.width + 40) / 380)
     let startX = -this.width / 2 + 10, startY = this.height / 2 - 140
     let roomInfos = this.children as RoomInfo[]
+    let promises = []
     roomInfos.forEach((roomInfo, index) => {
       if (roomInfo.hidden) roomInfo.hidden = false
-      roomInfo.slideTo(
+      promises.push(roomInfo.slideTo(
         startX + (index % colNum) * 380,
         startY - Math.floor(index / colNum) * 140,
         0
-      )
+      ))
     })
+    await Promise.all(promises)
+  }
+
+  public async focus(roomName: string): Promise<boolean> {
+    let roomInfo = this.name2Room.get(roomName)
+    if (roomInfo) {
+      this.name2Room.forEach((roomInfo, name) => {
+        if (name === roomName) return
+        console.log(name)
+        roomInfo.hidden = true
+      })
+      await roomInfo.slideTo(-roomInfo.width / 2, -roomInfo.height / 2, 100)
+      return true
+    }
+    return false
   }
 
   public set viewWidth(width: number) {
@@ -66,9 +82,9 @@ export default class RoomList extends BaseGroup {
     this.setViewSize(this.width, height)
   }
 
-  public setViewSize(width: number, height: number): void {
+  public setViewSize(width: number, height: number): Promise<void> {
     this.width = width
     this.height = height
-    this.rearrange()
+    return this.rearrange()
   }
 }

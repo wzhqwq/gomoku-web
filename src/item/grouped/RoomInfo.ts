@@ -25,6 +25,8 @@ export default class RoomInfo extends BaseGroup {
 
   constructor(room: Room, createBySelf: boolean = false) {
     super()
+    this.width = 350
+    this.height = 120
 
     // 绘制棋盘预览
     let boardFaceTexture = G.boardFaces.find(

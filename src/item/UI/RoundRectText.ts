@@ -69,7 +69,7 @@ export default class RoundRectText extends BaseComponent {
   }
 
   protected getMaterial(): Material {
-    if (this.cachedMaterial) return this.cachedMaterial
+    if (this.cachedMaterial) return this.cachedMaterial.clone()
     const { content, size, color, bgColor, variant } = this.options
     const ctx = this.canvas.getContext('2d')
 
