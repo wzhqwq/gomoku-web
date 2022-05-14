@@ -51,15 +51,15 @@ export default class RoundRectText extends BaseComponent {
     let content = cutText(ctx, this.options.content, Math.min(exactWidth ?? Infinity, minWidth) - 20)
     const {
       width,
-      actualBoundingBoxAscent,
-      actualBoundingBoxDescent
+      fontBoundingBoxAscent,
+      fontBoundingBoxDescent,
     } = ctx.measureText(content)
 
     this.width = this.canvas.width = exactWidth ?? (width + 20)
-    this.height = this.canvas.height = actualBoundingBoxAscent + actualBoundingBoxDescent + 20
+    this.height = this.canvas.height = fontBoundingBoxAscent + fontBoundingBoxDescent + 12
     this.textPos = {
       x: exactWidth ? (exactWidth - width) / 2 : 10,
-      y: actualBoundingBoxAscent + 10
+      y: fontBoundingBoxAscent + 6
     }
   }
 
