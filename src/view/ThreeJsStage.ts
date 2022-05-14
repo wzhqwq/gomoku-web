@@ -72,7 +72,8 @@ export default class ThreeJsStage implements Stage {
   public enterRoomPage(): void {
     this.roomTitle[0].dataset.position = "origin"
     if (!this.roomList) {
-      this.roomList = new RoomList(this.canvas.width(), this.canvas.height())
+      this.roomList = new RoomList()
+      this.setRoomList(this.canvas.width(), this.canvas.height())
     }
     this.scene.add(this.roomList)
   }
@@ -108,22 +109,24 @@ export default class ThreeJsStage implements Stage {
 
     this.renderer.setSize(width, height)
     
-    if (this.roomList) {
-      this.roomList.setViewSize(width, height)
-    }
+    this.setRoomList(width, height)
 
     if (!this.renderRunning) {
-      this.renderer.render(this.scene, this.camera)
+      this.doRender()
     }
   }
 
-  private render(): void {
+  private render = (): void => {
     if (this.renderRunning) {
-      this.renderer.render(this.scene, this.camera)
-      requestAnimationFrame(this.render.bind(this))
-      let delta = this.clock.getDelta()
-      G.mixers.forEach(mixer => mixer.update(delta))
+      this.doRender()
+      requestAnimationFrame(this.render)
     }
+  }
+
+  private doRender(): void {
+    this.renderer.render(this.scene, this.camera)
+    let delta = this.clock.getDelta()
+    G.mixers.forEach(mixer => mixer.update(delta))
   }
 
   private handleWindowBlur(): void {
@@ -162,6 +165,24 @@ export default class ThreeJsStage implements Stage {
   private handlePointerDown(): void {
     if (this.lastHoveredUuid) {
       G.pointerHandlers.get(this.lastHoveredUuid).callback("click")
+    }
+  }
+
+  private setRoomList(width: number, height: number): void {
+    if (this.roomList) {
+      this.roomList.setViewSize(width, height)
+      if (height > 700) {
+        if (this.roomList.position.z === 0) {
+          this.roomList.slideTo(0, 0, -80)
+          console.log(-80)
+        }
+      }
+      else {
+        if (this.roomList.position.z === -80) {
+          this.roomList.slideTo(0, 0, 0)
+          console.log(0)
+        }
+      }
     }
   }
 }

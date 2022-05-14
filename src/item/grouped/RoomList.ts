@@ -6,9 +6,8 @@ import BaseGroup from "@item/UI/BaseGroup"
 export default class RoomList extends BaseGroup {
   private name2Room: Map<string, RoomInfo> = new Map()
 
-  constructor(viewWidth: number, viewHeight: number) {
+  constructor() {
     super()
-    this.setViewSize(viewWidth, viewHeight)
   }
 
   public set rooms(rooms: Room[]) {

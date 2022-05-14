@@ -14,7 +14,6 @@ export default class RoundRectButton extends RoundRectText {
     super(options)
     let hoverAnimationAction = this.animationMixer.clipAction(new ScaleAnimationClip(0.2))
     hoverAnimationAction.setLoop(LoopOnce, 1)
-    G.mixers.set(this.uuid, this.animationMixer)
     this.animationMixer.addEventListener("finished", () => {
       hoverAnimationAction.paused = true
       hoverAnimationAction.enabled = true

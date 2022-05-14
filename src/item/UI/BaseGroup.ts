@@ -15,11 +15,12 @@ export default class BaseGroup extends Group
   public height: number
 
   private slideAnimationClip: AnimationClip = null
-  private slideResolver: (value?: void | PromiseLike<void>) => void
+  private slideResolvers: ((value?: void | PromiseLike<void>) => void)[] = []
 
   private _hidden: boolean = false
   
-  private slideEnd: Vector3
+  private slideEnd: Vector3 = null
+  private latestSlideEnd: Vector3 = null
 
   constructor() {
     super()
@@ -69,21 +70,36 @@ export default class BaseGroup extends Group
   }
 
   public slideTo(x: number, y: number, z: number): Promise<void> {
-    this.slideEnd = new Vector3(x, y, z)
+    if (!this.slideAnimationClip) {
+      this.slideEnd = new Vector3(x, y, z)
+      this.doSlide()
+    }
+    else {
+      this.latestSlideEnd = new Vector3(x, y, z)
+    }
+    
+    return new Promise(res => {
+      this.slideResolvers.push(res)
+    })
+  }
+
+  private doSlide() {
+    this.latestSlideEnd = null
     this.slideAnimationClip = new SlideAnimationClip(0.5, this.position, this.slideEnd)
     let animationAction = this.animationMixer.clipAction(this.slideAnimationClip)
     animationAction.setLoop(LoopOnce, 1)
     animationAction.play()
-    return new Promise(res => {
-      this.slideResolver = res
-    })
   }
 
   private slideAnimationFinishHandler = (): void => {
     if (!this.slideAnimationClip) return
     this.animationMixer.uncacheClip(this.slideAnimationClip)
     this.slideAnimationClip = null
-    this.slideResolver()
+    this.slideResolvers.forEach(res => res())
     this.position.copy(this.slideEnd)
+    if (this.latestSlideEnd) {
+      this.slideEnd = this.latestSlideEnd
+      this.doSlide()
+    }
   }
 }
