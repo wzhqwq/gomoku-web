@@ -3,15 +3,12 @@ import Room from "@model/base/Room"
 import G from "@util/global"
 import RoomInfo from "./RoomInfo"
 import { removeResources } from "@util/utils"
+import BaseGroup from "@item/UI/BaseGroup"
 
-export default class RoomList extends Group {
-  private _width: number
-  private _height: number
-
-  constructor(width: number, height: number) {
+export default class RoomList extends BaseGroup {
+  constructor(viewWidth: number, viewHeight: number) {
     super()
-    this._width = width
-    this._height = height
+    this.setViewSize(viewWidth, viewHeight)
   }
 
   public set rooms(rooms: Room[]) {
@@ -23,8 +20,8 @@ export default class RoomList extends Group {
   }
 
   public rearrange(): void {
-    let colNum = Math.floor((this._width + 40) / 380)
-    let startX = -this._width / 2 + 10, startY = this._height / 2 - 140
+    let colNum = Math.floor((this.width + 40) / 380)
+    let startX = -this.width / 2 + 10, startY = this.height / 2 - 140
     for (let i = 0; i < this.children.length; i++) {
       this.children[i].position.set(
         startX + (i % colNum) * 380,
@@ -34,15 +31,17 @@ export default class RoomList extends Group {
     }
   }
 
-  public set width(width: number) {
-    if (this._width === width) return
-    this._width = width
-    this.rearrange()
+  public set viewWidth(width: number) {
+    this.setViewSize(width, this.height)
   }
 
-  public set height(height: number) {
-    if (this._height === height) return
-    this._height = height
+  public set viewHeight(height: number) {
+    this.setViewSize(this.width, height)
+  }
+
+  public setViewSize(width: number, height: number): void {
+    this.width = width
+    this.height = height
     this.rearrange()
   }
 }

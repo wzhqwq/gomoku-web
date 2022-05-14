@@ -1,5 +1,5 @@
 import * as $ from "jquery"
-import { AmbientLight, Clock, PerspectiveCamera, Raycaster, Renderer, Scene, WebGLRenderer } from "three"
+import { AmbientLight, Clock, Matrix3, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneBufferGeometry, Raycaster, Renderer, Scene, Vector3, WebGLRenderer } from "three"
 import RoomList from "@item/grouped/RoomList"
 import Room from "@model/base/Room"
 import eventDispatcher from "@event/eventDispatcher"
@@ -52,7 +52,7 @@ export default class ThreeJsStage implements Stage {
     })
     this.clock = new Clock()
     this.camera = new PerspectiveCamera(
-      45,
+      60,
       window.innerWidth / window.innerHeight,
       1,
       1000
@@ -72,7 +72,7 @@ export default class ThreeJsStage implements Stage {
   public enterRoomPage(): void {
     this.roomTitle[0].dataset.position = "origin"
     if (!this.roomList) {
-      this.roomList = new RoomList(window.innerWidth, window.innerHeight - 300)
+      this.roomList = new RoomList(this.canvas.width() * 1.2, this.canvas.height() * 1.2)
     }
     this.scene.add(this.roomList)
   }
@@ -101,16 +101,19 @@ export default class ThreeJsStage implements Stage {
 
   // 私有方法
   private handleResize(): void {
-    this.canvas.width(window.innerWidth).height(window.innerHeight)
-    this.camera.aspect = window.innerWidth / window.innerHeight
+    let width = window.innerWidth - 100, height = window.innerHeight - 100
+    this.canvas.width(width).height(height)
+    this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+    this.renderer.setSize(width, height)
+    
+    if (this.roomList) {
+      this.roomList.setViewSize(width * 1.2, height * 1.2)
+    }
+
     if (!this.renderRunning) {
       this.renderer.render(this.scene, this.camera)
-    }
-    if (this.roomList) {
-      this.roomList.width = window.innerWidth
-      this.roomList.height = window.innerHeight - 300
     }
   }
 
@@ -141,8 +144,8 @@ export default class ThreeJsStage implements Stage {
     if (G.pointerHandlers.objects.length) {
       let rayCaster = new Raycaster()
       rayCaster.setFromCamera({
-        x: (event.x / window.innerWidth) * 2 - 1,
-        y: -(event.y / window.innerHeight) * 2 + 1
+        x: ((event.x - 50) / this.canvas.width()) * 2 - 1,
+        y: -((event.y - 100) / this.canvas.height()) * 2 + 1
       }, this.camera)
       let intersects = rayCaster.intersectObjects(G.pointerHandlers.objects)
         .map(intersect => intersect.object.uuid)[0]

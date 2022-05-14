@@ -32,7 +32,7 @@ export default class RoundRectButton extends RoundRectText {
           hoverAnimationAction.paused = false
           hoverAnimationAction.setEffectiveTimeScale(this.hovered ? 1 : -1)
           hoverAnimationAction.play()
-          window.document.body.style.cursor = this.hovered ? "pointer" : "default"
+          window.document.body.style.cursor = this.hovered && !this.hidden ? "pointer" : "default"
         }
       }
     })

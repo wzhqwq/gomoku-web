@@ -4,10 +4,12 @@ import { AnimationAction, AnimationMixer, BufferGeometry, LoopOnce, LoopPingPong
 import AnimatedComponent from "./AnimatedComponent";
 import BlinkableComponent from "./BlinkableComponent";
 import HidableComponent from "./HidableComponent";
+import SizedComponent from "./SizedComponent";
 
 export default abstract class BaseComponent extends Mesh
-    implements AnimatedComponent, HidableComponent, BlinkableComponent {
+    implements AnimatedComponent, HidableComponent, BlinkableComponent, SizedComponent {
   public animationMixer: AnimationMixer
+  public animationEnabled: boolean = true
   public width: number
   public height: number
 
@@ -31,7 +33,7 @@ export default abstract class BaseComponent extends Mesh
     this.hideAnimationAction.setLoop(LoopOnce, 1)
     this.animationMixer.addEventListener("finished", this.hideAnimationFinishHandler)
 
-    this.blinkAnimationAction = this.animationMixer.clipAction(new BlinkAnimationClip(0.6))
+    this.blinkAnimationAction = this.animationMixer.clipAction(new BlinkAnimationClip(0.8))
     this.blinkAnimationAction.setLoop(LoopPingPong, Infinity)
   }
 
@@ -47,9 +49,14 @@ export default abstract class BaseComponent extends Mesh
 
   public set hidden(value: boolean) {
     this._hidden = value
-    this.hideAnimationAction.paused = false
-    this.hideAnimationAction.setEffectiveTimeScale(value ? 1 : -1)
-    this.hideAnimationAction.play()
+    if (this.animationEnabled) {
+      this.hideAnimationAction.paused = false
+      this.hideAnimationAction.setEffectiveTimeScale(value ? 1 : -1)
+      this.hideAnimationAction.play()
+    }
+    else {
+      this.hideAnimationFinishHandler()
+    }
     if (!value && this._blinking && !this.blinkAnimationAction.isRunning()) {
       this.blinkAnimationAction.play()
     }
@@ -61,7 +68,7 @@ export default abstract class BaseComponent extends Mesh
 
   public set blinking(value: boolean) {
     this._blinking = value
-    if (value && !this._hidden) {
+    if (value && !this._hidden && this.animationEnabled) {
       this.blinkAnimationAction.play()
     }
     if (!value && this.blinkAnimationAction.isRunning()) {

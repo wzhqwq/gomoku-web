@@ -11,8 +11,9 @@ import RoomSelectEvent from "@event/RoomSelectEvent"
 import RoundRectButton from "@item/UI/RoundRectButton"
 import { primaryColor, primaryDarkColor } from "@util/constants"
 import BaseComponent from "@item/UI/BaseComponent"
+import BaseGroup from "@item/UI/BaseGroup"
 
-export default class RoomInfo extends Group {
+export default class RoomInfo extends BaseGroup {
   private bottomArea: RoundRectText
   private playersInfoArea: PlayersInfo
 
@@ -34,7 +35,8 @@ export default class RoomInfo extends Group {
 
     // 绘制房间名称
     let gameName = new RoundRectText({ content: room.gameName, size: 26, minWidth: 220 })
-    gameName.position.set(
+    gameName.setPositionByAnchor(
+      "bottomLeft",
       130,
       120 - gameName.height,
       0
@@ -43,7 +45,8 @@ export default class RoomInfo extends Group {
 
     // 绘制玩家信息
     let playersInfo = new PlayersInfo(room.players)
-    playersInfo.position.set(
+    playersInfo.setPositionByAnchor(
+      "bottomLeft",
       130,
       115 - gameName.height - playersInfo.height,
       0
@@ -62,15 +65,12 @@ export default class RoomInfo extends Group {
         color: "#ddd",
         exactWidth: 220,
       })
-      requesting.position.set(
+      requesting.setPositionByAnchor(
+        "bottomLeft",
         130,
         110 - gameName.height - playersInfo.height - requesting.height,
         0
       )
-      let requestingMixer = new AnimationMixer(requesting)
-      let requestingAction = requestingMixer.clipAction(new BlinkAnimationClip(1))
-      requestingAction.setLoop(LoopPingPong, Infinity)
-      requesting.visible = false
       this.add(requesting)
       
       this.bottomArea = new RoundRectButton({
@@ -79,18 +79,16 @@ export default class RoomInfo extends Group {
         bgColor: primaryColor,
         exactWidth: 220,
         onClick: () => {
-          this.bottomArea.visible = false
-          requesting.visible = true
-          requestingAction.play()
-          G.mixers.set(requesting.uuid, requestingMixer)
+          this.bottomArea.hidden = true
+          requesting.hidden = false
+          requesting.blinking = true
           eventDispatcher.dispatch("selectRoom", new RoomSelectEvent(
             room,
             (success: boolean) => {
-              requestingAction.stop()
-              G.mixers.delete(requesting.uuid)
-              requesting.visible = false
+              requesting.blinking = false
+              requesting.hidden = true
               if (!success) {
-                this.bottomArea.visible = true
+                this.bottomArea.hidden = false
               }
             }
           ))
@@ -105,7 +103,8 @@ export default class RoomInfo extends Group {
         color: "#ddd",
         exactWidth: 220,
       })
-      this.bottomArea.position.set(
+      this.bottomArea.setPositionByAnchor(
+        "bottomLeft",
         130,
         110 - gameName.height - playersInfo.height - this.bottomArea.height,
         0
@@ -123,7 +122,8 @@ export default class RoomInfo extends Group {
         exactWidth: 220,
       })
     }
-    this.bottomArea.position.set(
+    this.bottomArea.setPositionByAnchor(
+      "bottomLeft",
       130,
       110 - gameName.height - playersInfo.height - this.bottomArea.height,
       0
@@ -132,20 +132,7 @@ export default class RoomInfo extends Group {
   }
 }
 
-class PlayersInfo extends BaseComponent {
-  public readonly width: number
-  public readonly height: number
-
-  protected calculateSize(): void {
-    throw new Error("Method not implemented.")
-  }
-  protected getMaterial(): Material {
-    throw new Error("Method not implemented.")
-  }
-  protected getGeometry(): BufferGeometry {
-    throw new Error("Method not implemented.")
-  }
-  
+class PlayersInfo extends BaseGroup {
   constructor(private players: Player[] = []) {
     super()
     
@@ -153,6 +140,7 @@ class PlayersInfo extends BaseComponent {
     player1.setPositionByAnchor("bottomLeft", 0, 0, 0)
     this.add(player1)
     this.height = player1.height
+    this.width = player1.width
 
     if (players.length === 2) {
       let fontLoader = new FontLoader()
@@ -178,6 +166,7 @@ class PlayersInfo extends BaseComponent {
       let player2 = new RoundRectText({ content: players[1].name, minWidth: 100 })
       player2.setPositionByAnchor("bottomLeft", player1.width + 20, 0, 0)
       this.add(player2)
+      this.width += player2.width + 20
     }
     else {
       let emptyPlayer = new RoundRectText({
@@ -188,7 +177,7 @@ class PlayersInfo extends BaseComponent {
       })
       this.add(emptyPlayer)
 
-      emptyPlayer.position.set(player1.width + 5, 0, 0)
+      emptyPlayer.setPositionByAnchor("bottomLeft", player1.width + 5, 0, 0)
       // let animationClip = new BlinkAnimationClip(1)
       // let animationMixer = new AnimationMixer(emptyPlayer)
       // animationMixer.clipAction(animationClip)
@@ -197,7 +186,7 @@ class PlayersInfo extends BaseComponent {
       // G.mixers.set(emptyPlayer.uuid, animationMixer)
       emptyPlayer.blinking = true
 
-      console.log(G.mixers.values())
+      this.width += emptyPlayer.width + 5
     }
   }
 }
