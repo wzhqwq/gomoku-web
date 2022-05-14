@@ -4,23 +4,27 @@ import G from "@util/global"
 import RoundRectText from "@item/UI/RoundRectText"
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader"
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry"
-import BlinkAnimationClip from "@animation/BlinkAnimationClip"
 import Player from "@model/base/Player"
 import eventDispatcher from "@event/eventDispatcher"
 import RoomSelectEvent from "@event/SelectRoomEvent"
 import RoundRectButton from "@item/UI/RoundRectButton"
 import { primaryColor, primaryDarkColor } from "@util/constants"
 import BaseGroup from "@item/UI/BaseGroup"
+import Versus from "@item/basic/Versus"
 
 export default class RoomInfo extends BaseGroup {
-  private bottomArea: RoundRectText
-  private playersInfoArea: PlayersInfo
+  private boardFace: Mesh
+  private gameName: RoundRectText
+
+  private playersInfo: PlayersInfo
+  private bottomArea: RoundRectText = null
+  private lastBottomState: number = -1
+  private lastPlayersLength: number = -1
 
   public room: Room
 
   constructor(room: Room, createBySelf: boolean = false) {
     super()
-    this.room = room
 
     // 绘制棋盘预览
     let boardFaceTexture = G.boardFaces.find(
@@ -31,164 +35,232 @@ export default class RoomInfo extends BaseGroup {
       map: boardFaceTexture,
       transparent: true
     })
-    let boardFace = new Mesh(faceRect, faceMaterial)
-    boardFace.position.set(60, 60, 0)
-    this.add(boardFace)
+    this.boardFace = new Mesh(faceRect, faceMaterial)
+    this.boardFace.position.set(60, 60, 0)
+    this.add(this.boardFace)
 
     // 绘制房间名称
-    let gameName = new RoundRectText({ content: room.roomName, size: 26, minWidth: 220 })
-    gameName.setPositionByAnchor(
+    this.gameName = new RoundRectText({ content: room.roomName, size: 26, maxWidth: 220 })
+    this.gameName.setPositionByAnchor(
       "bottomLeft",
       130,
-      120 - gameName.height,
+      120 - this.gameName.height,
       0
     )
-    this.add(gameName)
+    this.add(this.gameName)
+
+    this.repaintInfo(room, createBySelf)
+  }
+
+  public repaintInfo(room: Room, createBySelf: boolean = false) {
+    this.room = room
+
+    let startY = 115 - this.gameName.height
 
     // 绘制玩家信息
-    let playersInfo = new PlayersInfo(room.players)
-    playersInfo.setPositionByAnchor(
-      "bottomLeft",
-      130,
-      115 - gameName.height - playersInfo.height,
-      0
-    )
-    this.add(playersInfo)
+    if (!this.playersInfo) {
+      this.playersInfo = new PlayersInfo(room.players)
+      this.playersInfo.setPositionByAnchor("bottomLeft", 130, startY - this.playersInfo.height, 0)
+      this.add(this.playersInfo)
+    }
+    else if (room.players.length !== this.lastPlayersLength) {
+      this.playersInfo.repaintInfo(room.players)
+    }
+    startY -= this.playersInfo.height + 5
 
-    // 绘制操作区域
+    // 绘制操作区域，以下四个函数可以在状态没有发生变化时不做任何事情
     let hasMe = room.players.some(p => p.name === G.me.name && !p.online)
 
     if (!room.isGameStarted || hasMe) {
       // 可以加入
-      let requesting = new RoundRectText({
-        content: "请求中...",
-        size: 16,
-        bgColor: primaryDarkColor,
-        color: "#ddd",
-        exactWidth: 220,
-      })
-      requesting.setPositionByAnchor(
-        "bottomLeft",
-        130,
-        110 - gameName.height - playersInfo.height - requesting.height,
-        0
-      )
-      this.add(requesting)
-      
-      this.bottomArea = new RoundRectButton({
-        content: hasMe ? "重新加入游戏" : "加入游戏",
-        size: 16,
-        bgColor: primaryColor,
-        exactWidth: 220,
-        onClick: () => {
-          this.bottomArea.hidden = true
-          requesting.hidden = false
-          requesting.blinking = true
-          eventDispatcher.dispatch("selectRoom", new RoomSelectEvent(
-            room,
-            (success: boolean) => {
-              requesting.blinking = false
-              requesting.hidden = true
-              if (!success) {
-                this.bottomArea.hidden = false
-              }
-            }
-          ))
-        }
-      })
+      this.drawEnterGame(130, startY, room)
     }
     else if (createBySelf) {
-      this.bottomArea = new RoundRectText({
-        content: "等待玩家加入...",
-        size: 16,
-        bgColor: primaryDarkColor,
-        color: "#ddd",
-        exactWidth: 220,
-      })
-      this.bottomArea.setPositionByAnchor(
-        "bottomLeft",
-        130,
-        110 - gameName.height - playersInfo.height - this.bottomArea.height,
-        0
-      )
-      let waitingMixer = new AnimationMixer(this.bottomArea)
-      let waitingAction = waitingMixer.clipAction(new BlinkAnimationClip(1))
-      waitingAction.setLoop(LoopPingPong, Infinity)
+      // 自己创建的房间，等待玩家加入
+      this.drawWaitForOpponent(130, startY)
+    }
+    else if (room.isGameOver) {
+      // 游戏结束
+      this.intoEndedState(130, startY)
     }
     else {
-      this.bottomArea = new RoundRectText({
-        content: room.isGameOver? "游戏结束" : "游戏中",
-        size: 16,
-        bgColor: room.isGameOver? "#333" : "#004435",
-        color: room.isGameOver? "#ddd" : "#2bffd0",
-        exactWidth: 220,
-      })
+      // 游戏进行中
+      this.intoPlayingState(130, startY)
     }
-    this.bottomArea.setPositionByAnchor(
-      "bottomLeft",
-      130,
-      110 - gameName.height - playersInfo.height - this.bottomArea.height,
-      0
-    )
+  }
+
+  private drawEnterGame(x: number, y: number, room: Room) {
+    if (this.lastBottomState == 0) return
+    this.lastBottomState = 0
+
+    let hasMe = room.players.some(p => p.name === G.me.name && !p.online)
+
+    let requesting = new RoundRectText({
+      content: "请求中...",
+      size: 16,
+      bgColor: primaryDarkColor,
+      color: "#ddd",
+      exactWidth: 220,
+    })
+    requesting.setPositionByAnchor("bottomLeft", x, y - requesting.height, 0)
+    requesting.animationEnabled = false
+    requesting.hidden = true
+    requesting.animationEnabled = true
+    this.add(requesting)
+    
+    this.bottomArea = new RoundRectButton({
+      content: hasMe ? "重新加入游戏" : "加入游戏",
+      size: 16,
+      bgColor: primaryColor,
+      exactWidth: 220,
+      onClick: () => {
+        this.bottomArea.hidden = true
+        requesting.hidden = false
+        requesting.blinking = true
+        eventDispatcher.dispatch("selectRoom", new RoomSelectEvent(
+          room,
+          (success: boolean) => {
+            requesting.blinking = false
+            requesting.hidden = true
+            if (!success) {
+              this.bottomArea.hidden = false
+            }
+          }
+        ))
+      }
+    })
+    this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
+
+    this.add(this.bottomArea)
+  }
+
+  private drawWaitForOpponent(x: number, y: number) {
+    if (this.lastBottomState == 1) return
+    this.lastBottomState = 1
+    
+    this.bottomArea = new RoundRectText({
+      content: "等待玩家加入...",
+      size: 16,
+      bgColor: primaryDarkColor,
+      color: "#ddd",
+      exactWidth: 220,
+    })
+    this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
+    this.bottomArea.blinking = true
+
+    this.add(this.bottomArea)
+  }
+
+  private intoPlayingState(x: number, y: number) {
+    if (this.lastBottomState == 2) return
+    this.lastBottomState = 2
+    
+    let isChange = this.bottomArea !== null
+    if (isChange) {
+      this.bottomArea.blinking = false
+      this.bottomArea.hidden = true
+    }
+
+    this.bottomArea = new RoundRectText({
+      content: "游戏中",
+      size: 16,
+      bgColor: "#004435",
+      color: "#2bffd0",
+      exactWidth: 220,
+    })
+
+    this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
+    if (isChange) {
+      this.bottomArea.animationEnabled = false
+      this.bottomArea.hidden = true
+      this.bottomArea.animationEnabled = true
+      this.bottomArea.hidden = false
+    }
+
+    this.add(this.bottomArea)
+  }
+
+  private intoEndedState(x: number, y: number) {
+    if (this.lastBottomState == 3) return
+    this.lastBottomState = 3
+    
+    let isChange = this.bottomArea !== null
+    if (isChange) {
+      this.bottomArea.blinking = false
+      this.bottomArea.hidden = true
+    }
+
+    this.bottomArea = new RoundRectText({
+      content: "游戏结束",
+      size: 16,
+      bgColor: "#333",
+      color: "#ddd",
+      exactWidth: 220,
+    })
+
+    this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
+    if (isChange) {
+      this.bottomArea.animationEnabled = false
+      this.bottomArea.hidden = true
+      this.bottomArea.animationEnabled = true
+      this.bottomArea.hidden = false
+    }
+
     this.add(this.bottomArea)
   }
 }
 
 class PlayersInfo extends BaseGroup {
-  constructor(private players: Player[] = []) {
+  private player1: RoundRectText
+  private emptyPlayer: RoundRectText
+
+  constructor(players: Player[] = []) {
     super()
     
-    let player1 = new RoundRectText({ content: players[0].name, minWidth: 100 })
-    player1.setPositionByAnchor("bottomLeft", 0, 0, 0)
-    this.add(player1)
-    this.height = player1.height
-    this.width = player1.width
+    this.player1 = new RoundRectText({ content: players[0].name, maxWidth: 100 })
+    this.player1.setPositionByAnchor("bottomLeft", 0, 0, 0)
+    this.add(this.player1)
+    this.height = this.player1.height
+    this.width = this.player1.width
 
+    this.repaintInfo(players)
+  }
+
+  public repaintInfo(players: Player[]) {
     if (players.length === 2) {
-      let fontLoader = new FontLoader()
-      fontLoader.load("font/huge.json", font => {
-        let versusGeometry = new TextGeometry("VS", {
-          font,
-          size: 18,
-          height: 1,
-          curveSegments: 12,
-          bevelEnabled: true,
-          bevelThickness: 3,
-          bevelSize: 0,
-        })
-        let versusMaterial = new MeshMatcapMaterial({
-          matcap: G.matcaps.vs,
-        })
-        let versus = new Mesh(versusGeometry, versusMaterial)
-        versus.rotateX(Math.PI / 8)
-        versus.position.set(player1.width - 8, 8, 0)
-        this.add(versus)
-      })
+      if (this.emptyPlayer) {
+        this.emptyPlayer.blinking = false
+        this.emptyPlayer.hidden = true
+      }
+      
+      let versus = new Versus()
+      versus.position.set(this.player1.width - 10, 8, 0)
+      this.add(versus)
 
-      let player2 = new RoundRectText({ content: players[1].name, minWidth: 100 })
-      player2.setPositionByAnchor("bottomLeft", player1.width + 20, 0, 0)
+      let player2 = new RoundRectText({ content: players[1].name, maxWidth: 100 })
+      player2.setPositionByAnchor("bottomLeft", this.player1.width + 20, 0, 0)
       this.add(player2)
-      this.width += player2.width + 20
+      if (this.emptyPlayer) {
+        player2.animationEnabled = false
+        player2.hidden = true
+        player2.animationEnabled = true
+        player2.hidden = false
+      }
+      this.width = this.player1.width + player2.width + 20
     }
     else {
-      let emptyPlayer = new RoundRectText({
+      this.emptyPlayer = new RoundRectText({
         content: "等待对手",
         variant: "outlined",
         bgColor: "#555",
         color: "#ddd"
       })
-      this.add(emptyPlayer)
+      this.add(this.emptyPlayer)
 
-      emptyPlayer.setPositionByAnchor("bottomLeft", player1.width + 5, 0, 0)
-      // let animationClip = new BlinkAnimationClip(1)
-      // let animationMixer = new AnimationMixer(emptyPlayer)
-      // animationMixer.clipAction(animationClip)
-      //   .play()
-      //   .setLoop(LoopPingPong, Infinity)
-      // G.mixers.set(emptyPlayer.uuid, animationMixer)
-      emptyPlayer.blinking = true
+      this.emptyPlayer.setPositionByAnchor("bottomLeft", this.player1.width + 5, 0, 0)
+      this.emptyPlayer.blinking = true
 
-      this.width += emptyPlayer.width + 5
+      this.width = this.player1.width + this.emptyPlayer.width + 5
     }
   }
 }

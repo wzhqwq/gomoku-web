@@ -42,18 +42,16 @@ export function cutText(ctx: CanvasRenderingContext2D, text: string, maxWidth: n
   return text.substring(0, l - 1) + ellipsis
 }
 
-export function removeResources(obj: Object3D) {
+export function removeSideEffects(obj: Object3D) {
   obj.traverse(item => {
     if (item instanceof Mesh) {
-      let t = item as Mesh
-      t.geometry.dispose()
-      if (G.mixers.has(t.uuid)) {
-        let mixer = G.mixers.get(t.uuid)
-        mixer.stopAllAction().uncacheRoot(t)
-        G.mixers.delete(t.uuid)
+      if (G.mixers.has(item.uuid)) {
+        let mixer = G.mixers.get(item.uuid)
+        mixer.stopAllAction().uncacheRoot(item)
+        G.mixers.delete(item.uuid)
       }
-      if (G.pointerHandlers.has(t.uuid)) {
-        G.pointerHandlers.delete(t.uuid)
+      if (G.pointerHandlers.has(item.uuid)) {
+        G.pointerHandlers.delete(item.uuid)
       }
     }
   })

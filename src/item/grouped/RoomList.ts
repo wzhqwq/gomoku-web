@@ -1,6 +1,6 @@
 import Room from "@model/base/Room"
 import RoomInfo from "./RoomInfo"
-import { removeResources } from "@util/utils"
+import { removeSideEffects } from "@util/utils"
 import BaseGroup from "@item/UI/BaseGroup"
 
 export default class RoomList extends BaseGroup {
@@ -18,6 +18,7 @@ export default class RoomList extends BaseGroup {
       if (roomInfo) {
         existRooms.push(roomInfo)
         this.name2Room.delete(room.roomName)
+        roomInfo.repaintInfo(room)
       } else {
         newComerRooms.push(new RoomInfo(room))
       }
@@ -25,7 +26,7 @@ export default class RoomList extends BaseGroup {
     
     this.name2Room.forEach(roomInfo => {
       this.remove(roomInfo)
-      removeResources(roomInfo)
+      removeSideEffects(roomInfo)
     })
     this.name2Room.clear()
 

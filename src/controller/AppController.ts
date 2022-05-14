@@ -11,7 +11,10 @@ export default class AppController {
   // controllers
   private roomController: RoomController = G.roomController
 
-  public startApp(): void {
+  public async startApp() {
+    // 初始化
+    await G.fonts.loadFonts()
+
     let { nickname, serverUrl } = G.setting
     this.userInput.ask(nickname, serverUrl).then(settings => {
       if (settings) {

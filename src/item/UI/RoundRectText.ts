@@ -1,8 +1,7 @@
-import BlinkAnimationClip from "@animation/BlinkAnimationClip"
-import { AnimationAction, AnimationMixer, BufferGeometry, CanvasTexture, Group, LoopOnce, Material, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from "three"
+import { AnimationMixer, BufferGeometry, CanvasTexture, Group, LoopOnce, Material, Mesh, MeshBasicMaterial, PlaneBufferGeometry } from "three"
 import { cutText, fillRoundRect, strokeRoundRect } from "../../util/utils"
-import AnimatedComponent from "./AnimatedComponent"
 import BaseComponent from "./BaseComponent"
+import * as md5 from "md5"
 
 export type RoundRectTextOptions = {
   content: string
@@ -10,7 +9,7 @@ export type RoundRectTextOptions = {
   color?: string
   bgColor?: string
   variant?: "filled" | "outlined"
-  minWidth?: number
+  maxWidth?: number
   exactWidth?: number
 }
 
@@ -25,30 +24,36 @@ export default class RoundRectText extends BaseComponent {
   private canvas: HTMLCanvasElement
   private textPos: { x: number, y: number }
 
+  private static materialCache: Map<string, Material> = new Map()
+  private cachedMaterial: Material | null = null
+
   constructor({
     content,
     size = 14,
     color = '#fff',
     bgColor = '#222',
     variant = 'filled',
-    minWidth = Infinity,
+    maxWidth = Infinity,
     exactWidth = null,
   }: RoundRectTextOptions) {
     super()
 
-    this.options = { content, size, color, bgColor, variant, minWidth, exactWidth }
+    this.options = { content, size, color, bgColor, variant, maxWidth, exactWidth }
+    this.cachedMaterial = RoundRectText.materialCache.get(md5(JSON.stringify(this.options)))
     this.canvas = document.createElement('canvas')
 
-    this.buildMesh();
+    this.buildMesh()
+
+    this.canvas = null
   }
 
   protected calculateSize(): void {
-    const { size, exactWidth, minWidth } = this.options
+    const { size, exactWidth, maxWidth } = this.options
     const ctx = this.canvas.getContext('2d')
 
     ctx.font = `${size}px sans-serif`
 
-    let content = cutText(ctx, this.options.content, Math.min(exactWidth ?? Infinity, minWidth) - 20)
+    let content = cutText(ctx, this.options.content, Math.min(exactWidth ?? Infinity, maxWidth) - 20)
     const {
       width,
       fontBoundingBoxAscent,
@@ -64,6 +69,7 @@ export default class RoundRectText extends BaseComponent {
   }
 
   protected getMaterial(): Material {
+    if (this.cachedMaterial) return this.cachedMaterial
     const { content, size, color, bgColor, variant } = this.options
     const ctx = this.canvas.getContext('2d')
 
@@ -84,10 +90,12 @@ export default class RoundRectText extends BaseComponent {
     ctx.fillText(content, this.textPos.x, this.textPos.y)
 
     const texture = new CanvasTexture(this.canvas)
-    return new MeshBasicMaterial({
+    let material = new MeshBasicMaterial({
       map: texture,
       transparent: true
     })
+    RoundRectText.materialCache.set(md5(JSON.stringify(this.options)), material)
+    return material
   }
   
   protected getGeometry(): BufferGeometry {

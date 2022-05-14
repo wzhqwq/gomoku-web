@@ -16,6 +16,7 @@ import RawInterceptor from "@interceptor/RawInterceptor"
 import ChessboardInterceptor from "@interceptor/ChessBoardInterceptor"
 import WebSocketClient from "./WebSocketClient"
 import { boardStyles } from "./constants"
+import Fonts from "./Fonts"
 
 type BoardFaceInfo = {
   size: number
@@ -36,11 +37,14 @@ class Global {
   // three.js
   private _matcaps: { [key: string]: Texture } = null
   private _boardFaces: BoardFaceInfo[] = null
-  public mixers: Map<string, AnimationMixer> = new Map()
-  public pointerHandlers: PointerHandlers = new PointerHandlers()
+  public readonly mixers: Map<string, AnimationMixer> = new Map()
+  public readonly pointerHandlers: PointerHandlers = new PointerHandlers()
+
+  // 杂项
   
   private _interceptors: Interceptor[] = null
   private _WSClient: WebSocketClient = null
+  public readonly fonts: Fonts = new Fonts()
 
   // 状态
   public setting: Setting = new Setting(
@@ -50,7 +54,6 @@ class Global {
 
   public me: Player = null
   public currentRoom: Room = null
-
 
   public get roomController(): RoomController {
     if (this._roomController === null) {

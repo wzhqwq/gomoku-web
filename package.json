@@ -2,6 +2,7 @@
   "dependencies": {
     "global": "^4.4.0",
     "jquery": "^3.6.0",
+    "md5": "^2.3.0",
     "path-browserify": "^1.0.1",
     "qs": "^6.10.3",
     "socket.io": "^4.5.0",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.5.14",
+    "@types/md5": "^2.3.2",
     "@types/three": "^0.140.0",
     "css-loader": "^6.7.1",
     "sass": "^1.51.0",
