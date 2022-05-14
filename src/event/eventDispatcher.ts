@@ -1,11 +1,13 @@
 import BaseEvent from "./BaseEvent"
-import { RoomCreateEvent, RoomFetchEvent } from "./emptyEvents"
-import RoomSelectEvent from "./RoomSelectEvent"
+import DoCreateRoomEvent from "./DoCreateRoomEvent"
+import { CreateRoomEvent, FetchRoomEvent } from "./emptyEvents"
+import SelectRoomEvent from "./SelectRoomEvent"
 
 export interface EventMap {
-  selectRoom: RoomSelectEvent
-  createRoom: RoomCreateEvent
-  fetchRooms: RoomFetchEvent
+  selectRoom: SelectRoomEvent
+  createRoom: CreateRoomEvent
+  fetchRooms: FetchRoomEvent
+  doCreateRoom: DoCreateRoomEvent
 }
 
 export type EventNameType = keyof EventMap

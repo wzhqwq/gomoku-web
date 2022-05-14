@@ -11,10 +11,22 @@ export default class WebSocketClient {
   private session: WebSocket = null
   private sendResolver: (message: BaseMessage | void) => void = null
 
-  constructor(room: Room, interceptors: Interceptor[]) {
+  public get isOpened(): boolean {
+    return this.session !== null
+  }
+
+  public disconnect(): void {
+    if (this.session !== null) {
+      this.session.close()
+      this.session = null
+    }
+  }
+
+  public connect(room: Room, interceptors: Interceptor[]): Promise<BaseMessage | void> {
+    if (this.isOpened) this.disconnect()
     this.session = new WebSocket(`ws://${G.setting.serverUrl}/ws?${stringify({
       "Username": G.me.name,
-      "GameName": room.gameName,
+      "GameName": room.roomName,
       "ChessboardSize": room.size,
     })}`)
 
@@ -29,21 +41,15 @@ export default class WebSocketClient {
         if (!interceptor.preferredTypes || interceptor.preferredTypes.includes(message.type)) {
           return interceptor.intercept(message)
         }
+        return message
       }, message)
       this.sendResolver?.(intercepted)
       this.sendResolver = null
     }
-  }
 
-  public get isOpened(): boolean {
-    return this.session !== null
-  }
-
-  public dispose(): void {
-    if (this.session !== null) {
-      this.session.close()
-      this.session = null
-    }
+    return new Promise(res => {
+      this.sendResolver = res
+    })
   }
 
   public send(message: BaseRequest): Promise<BaseMessage | void> {

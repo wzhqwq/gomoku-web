@@ -1,3 +1,5 @@
+import DoCreateRoomEvent from "@event/DoCreateRoomEvent"
+import eventDispatcher from "@event/eventDispatcher"
 import { boardStyles } from "@util/constants"
 import * as $ from "jquery"
 import Modal from "./Modal"
@@ -7,37 +9,42 @@ export type RoomInfoType = {
   size: number
 }
 
-export default class UserInput extends Modal {
+export default class NewRoom extends Modal {
   private roomInput: JQuery<HTMLInputElement>
   private boardSizeRadios: JQuery<HTMLInputElement>[]
-
-  // promises
-  private confirmResolver: (value?: RoomInfoType | PromiseLike<RoomInfoType>) => void
+  private roomHelper: JQuery<HTMLDivElement>
 
   constructor() {
     super("#new-room-modal")
     this.roomInput = $("#room-name")
+    this.roomHelper = $("#room-name-helper")
     this.boardSizeRadios = boardStyles.map(({ size }) =>
       $(`#board-size-${size}`)
     )
 
     $("#btn-confirm-new-room").on("click", () =>
-      this.confirmResolver?.({
+      eventDispatcher.dispatch("doCreateRoom", new DoCreateRoomEvent({
         roomName: this.roomInput.val() as string,
         size: this.boardSizeRadios.find(radio => radio.prop("checked")).val() as number,
-      })
+      }))
     )
-    $("#btn-cancel-new-room").on("click", () => this.confirmResolver?.(null))
+    $("#btn-cancel-new-room").on("click", () => eventDispatcher.dispatch("doCreateRoom", null))
+    this.roomHelper.on("animationend", () => this.roomHelper.removeClass("shake"))
   }
 
-  public ask(): Promise<RoomInfoType> {
+  public ask(): void {
     this.roomInput.val("")
     this.boardSizeRadios[0].prop("checked", true)
     
     this.showModal()
+  }
 
-    return new Promise(resolve => {
-      this.confirmResolver = resolve
-    })
+  public showError(error: string) {
+    this.roomHelper.text(error)
+    this.roomHelper.addClass(["has-error", "shake"])
+  }
+
+  public hideError() {
+    this.roomHelper.removeClass("has-error")
   }
 }

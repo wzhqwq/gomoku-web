@@ -39,7 +39,8 @@ class Global {
   public mixers: Map<string, AnimationMixer> = new Map()
   public pointerHandlers: PointerHandlers = new PointerHandlers()
   
-  public _interceptors: Interceptor[] = null
+  private _interceptors: Interceptor[] = null
+  private _WSClient: WebSocketClient = null
 
   // 状态
   public setting: Setting = new Setting(
@@ -50,7 +51,6 @@ class Global {
   public me: Player = null
   public currentRoom: Room = null
 
-  public WSClient: WebSocketClient = null
 
   public get roomController(): RoomController {
     if (this._roomController === null) {
@@ -112,6 +112,13 @@ class Global {
       ]
     }
     return this._interceptors
+  }
+
+  public get WSClient(): WebSocketClient {
+    if (this._WSClient === null) {
+      this._WSClient = new WebSocketClient()
+    }
+    return this._WSClient
   }
 }
 

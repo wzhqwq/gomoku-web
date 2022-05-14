@@ -4,6 +4,7 @@ import Modal from "./Modal"
 export default class UserInput extends Modal {
   private nameInput: JQuery<HTMLInputElement>
   private urlInput: JQuery<HTMLInputElement>
+  private nameHelper: JQuery<HTMLDivElement>
 
   // promises
   private confirmResolver: (value?: string[] | PromiseLike<string[]>) => void
@@ -12,6 +13,7 @@ export default class UserInput extends Modal {
     super("#input-modal")
     this.nameInput = $("#nickname")
     this.urlInput = $("#server-url")
+    this.nameHelper = $("#nickname-helper")
 
     $("#btn-confirm-nickname").on("click", () =>
       this.confirmResolver?.([
@@ -20,6 +22,7 @@ export default class UserInput extends Modal {
       ])
     )
     $("#btn-cancel-nickname").on("click", () => this.confirmResolver?.(null))
+    this.nameHelper.on("animationend", () => this.nameHelper.removeClass("shake"))
   }
 
   public ask(defaultName: string, defaultUrl: string): Promise<string[]> {
@@ -31,5 +34,14 @@ export default class UserInput extends Modal {
     return new Promise(resolve => {
       this.confirmResolver = resolve
     })
+  }
+
+  public showError(error: string) {
+    this.nameHelper.text(error)
+    this.nameHelper.addClass(["has-error", "shake"])
+  }
+
+  public hideError() {
+    this.nameHelper.removeClass("has-error")
   }
 }

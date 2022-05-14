@@ -1,9 +1,9 @@
 import BaseEvent from "./BaseEvent"
 
-export class RoomCreateEvent implements BaseEvent {
-  public TYPE = Symbol("RoomCreateEvent")
+export class CreateRoomEvent implements BaseEvent {
+  public TYPE = Symbol("CreateRoomEvent")
 }
 
-export class RoomFetchEvent implements BaseEvent {
-  public TYPE = Symbol("RoomFetchEvent")
+export class FetchRoomEvent implements BaseEvent {
+  public TYPE = Symbol("FetchRoomEvent")
 }

@@ -141,25 +141,32 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  transition-property: filter, transform;
-  transition-duration: .3s;
+  transition: background-color .3s ease-out;
   &[data-toggle="hide"] {
-    filter: opacity(0);
-    transform: translate(0, 200px) scale(.5);
-    transition-timing-function: ease-in;
+    background-color: #0000;
+    > .modal-content {
+      filter: opacity(0);
+      transform: translate(0, 200px) scale(.5);
+      transition-timing-function: ease-in;
+    }
   }
   &[data-toggle="open"] {
-    filter: opacity(1);
-    transform: translate(0, 0) scale(1);
-    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-color: #000A;
+    > .modal-content {
+      filter: opacity(1);
+      transform: translate(0, 0) scale(1);
+      transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
   }
+  will-change: display, background-color;
 }
 .modal-content {
   background-color: $card-bg;
   border-radius: $card-radius;
-  width: 300px;
+  width: 400px;
   color: white;
-  box-shadow: -2px 2px 4px #0003;
+  transition-property: filter, transform;
+  transition-duration: .3s;
   .modal-header {
     font-size: 22px;
     padding: 10px 20px;
@@ -173,9 +180,11 @@ body {
     display: flex;
     justify-content: flex-end;
   }
+  will-change: filter, transform, transition-timing-function;
 }
 
 .form-line {
+  position: relative;
   padding: 10px 0;
   > label {
     margin-bottom: 10px;
@@ -259,5 +268,35 @@ body {
     .radio-label {
       padding: 10px;
     }
+  }
+  .form-helper {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    background-color: $danger;
+    color: white;
+    font-size: 14px;
+    padding: 2px 5px;
+    border-radius: $item-radius;
+    filter: opacity(0);
+    transition: filter 0.3s ease-out;
+    &.has-error {
+      filter: opacity(1);
+    }
+    &.shake {
+      animation: shake 0.3s ease-out;
+    }
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 50%, 90% {
+    transform: translateX(-5px);
+  }
+  30%, 70% {
+    transform: translateX(5px);
   }
 }

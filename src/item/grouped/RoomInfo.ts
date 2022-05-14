@@ -7,18 +7,20 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry"
 import BlinkAnimationClip from "@animation/BlinkAnimationClip"
 import Player from "@model/base/Player"
 import eventDispatcher from "@event/eventDispatcher"
-import RoomSelectEvent from "@event/RoomSelectEvent"
+import RoomSelectEvent from "@event/SelectRoomEvent"
 import RoundRectButton from "@item/UI/RoundRectButton"
 import { primaryColor, primaryDarkColor } from "@util/constants"
-import BaseComponent from "@item/UI/BaseComponent"
 import BaseGroup from "@item/UI/BaseGroup"
 
 export default class RoomInfo extends BaseGroup {
   private bottomArea: RoundRectText
   private playersInfoArea: PlayersInfo
 
+  public room: Room
+
   constructor(room: Room, createBySelf: boolean = false) {
     super()
+    this.room = room
 
     // 绘制棋盘预览
     let boardFaceTexture = G.boardFaces.find(
@@ -34,7 +36,7 @@ export default class RoomInfo extends BaseGroup {
     this.add(boardFace)
 
     // 绘制房间名称
-    let gameName = new RoundRectText({ content: room.gameName, size: 26, minWidth: 220 })
+    let gameName = new RoundRectText({ content: room.roomName, size: 26, minWidth: 220 })
     gameName.setPositionByAnchor(
       "bottomLeft",
       130,
@@ -54,7 +56,7 @@ export default class RoomInfo extends BaseGroup {
     this.add(playersInfo)
 
     // 绘制操作区域
-    let hasMe = room.players.some(p => p.name === G.me.name)
+    let hasMe = room.players.some(p => p.name === G.me.name && !p.online)
 
     if (!room.isGameStarted || hasMe) {
       // 可以加入

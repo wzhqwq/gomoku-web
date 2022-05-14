@@ -20,7 +20,7 @@ export default class AppController {
         }
         G.setting = new Setting(settings[0], settings[1])
         G.setting.save()
-        G.me = new Player(nickname, true, null)
+        G.me = new Player(settings[0], true, null)
         this.roomController.startRoom()
         this.userInput.hideModal()
       }

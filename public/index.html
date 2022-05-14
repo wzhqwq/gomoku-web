@@ -15,7 +15,7 @@
         房间列表
         <div class="btns">
           <button class="btn btn-dark" id="btn-refresh">刷新列表</button>
-          <button class="btn btn-primary" id="btn-create">创建房间</button>
+          <button class="btn btn-primary" id="btn-create">创建 / 加入房间</button>
         </div>
       </div>
       <div class="control-panel">
@@ -70,44 +70,16 @@
         </div>
       </div>
         <!-- modal的控制关键字是hide和open -->
-        <div class="modal" data-toggle="hide" id="input-modal">
-          <div class="modal-content">
-            <div class="modal-header">游戏配置</div>
-            <div class="modal-body">
-              <div class="form-line">
-                <label for="nickname">昵称</label>
-                <div class="input-wrapper">
-                  <input type="text" id="nickname" />
-                </div>
-              </div>
-              <div class="form-line">
-                <label for="server-url">服务器URL</label>
-                <div class="input-wrapper">
-                  <input type="text" id="server-url" />
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <div class="btns">
-                <button class="btn btn-primary" id="btn-confirm-nickname">
-                  进入游戏
-                </button>
-                <button class="btn btn-dark" id="btn-cancel-nickname">
-                  退出
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="modal" data-toggle="hide" id="new-room-modal" style="display: none;">
           <div class="modal-content">
-            <div class="modal-header">创建房间</div>
+            <div class="modal-header">创建房间 / 按房间名字加入房间</div>
             <div class="modal-body">
               <div class="form-line">
                 <label for="room-name">房间名称</label>
                 <div class="input-wrapper">
                   <input type="text" id="room-name" />
                 </div>
+                <div class="form-helper" id="room-name-helper"></div>
               </div>
               <div class="form-line">
                 <label for="new-room">棋盘大小</label>
@@ -130,10 +102,40 @@
             <div class="modal-footer">
               <div class="btns">
                 <button class="btn btn-primary" id="btn-confirm-new-room">
-                  创建房间
+                  创建 / 加入房间
                 </button>
                 <button class="btn btn-dark" id="btn-cancel-new-room">
                   取消
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal" data-toggle="hide" id="input-modal">
+          <div class="modal-content">
+            <div class="modal-header">游戏配置</div>
+            <div class="modal-body">
+              <div class="form-line">
+                <label for="nickname">昵称</label>
+                <div class="input-wrapper">
+                  <input type="text" id="nickname" />
+                </div>
+                <div class="form-helper" id="nickname-helper"></div>
+              </div>
+              <div class="form-line">
+                <label for="server-url">服务器URL</label>
+                <div class="input-wrapper">
+                  <input type="text" id="server-url" />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="btns">
+                <button class="btn btn-primary" id="btn-confirm-nickname">
+                  进入游戏
+                </button>
+                <button class="btn btn-dark" id="btn-cancel-nickname">
+                  退出
                 </button>
               </div>
             </div>

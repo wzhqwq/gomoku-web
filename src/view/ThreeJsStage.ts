@@ -4,7 +4,7 @@ import RoomList from "@item/grouped/RoomList"
 import Room from "@model/base/Room"
 import eventDispatcher from "@event/eventDispatcher"
 import G from "@util/global"
-import { RoomCreateEvent, RoomFetchEvent } from "@event/emptyEvents"
+import { CreateRoomEvent, FetchRoomEvent } from "@event/emptyEvents"
 import Stage from "./AbstractStage"
 
 export default class ThreeJsStage implements Stage {
@@ -34,8 +34,8 @@ export default class ThreeJsStage implements Stage {
     this.canvas = $("#stage")
 
     // DOM事件
-    this.roomRefreshButton.on("click", () => eventDispatcher.dispatch("fetchRooms", new RoomFetchEvent()))
-    this.roomCreateButton.on("click", () => eventDispatcher.dispatch("createRoom", new RoomCreateEvent()))
+    this.roomRefreshButton.on("click", () => eventDispatcher.dispatch("fetchRooms", new FetchRoomEvent()))
+    this.roomCreateButton.on("click", () => eventDispatcher.dispatch("createRoom", new CreateRoomEvent()))
 
     // 全局DOM事件
     window.addEventListener("resize", this.handleResize.bind(this))

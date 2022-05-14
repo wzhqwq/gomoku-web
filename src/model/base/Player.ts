@@ -10,6 +10,6 @@ export default class Player {
   }
 
   public static fromRawObject(rawObject: any): Player {
-    return new Player(rawObject.username, rawObject.online, rawObject.chessType)
+    return new Player(rawObject.username, rawObject.isOnline, rawObject.chessType)
   }
 }

@@ -3,7 +3,7 @@ import Player from "./Player";
 
 export default class Room {
   constructor(
-    public gameName: string,
+    public roomName: string,
     public players: Player[],
     public isGameStarted: boolean,
     public isGameOver: boolean,
@@ -21,7 +21,7 @@ export default class Room {
     )
   }
 
-  public static createRoom(gameName: string, size: number) {
-    return new Room(gameName, [G.me], false, false, size)
+  public static createRoom(roomName: string, size: number) {
+    return new Room(roomName, [G.me], false, false, size)
   }
 }

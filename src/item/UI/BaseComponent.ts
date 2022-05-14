@@ -48,8 +48,11 @@ export default abstract class BaseComponent extends Mesh
   }
 
   public set hidden(value: boolean) {
+    if (this._hidden === value) return
     this._hidden = value
     if (this.animationEnabled) {
+      this.hideAnimationAction.weight = this._blinking && !value ? 0 : 1
+      this.blinkAnimationAction.weight = value ? 0 : 1
       this.hideAnimationAction.paused = false
       this.hideAnimationAction.setEffectiveTimeScale(value ? 1 : -1)
       this.hideAnimationAction.play()
@@ -59,6 +62,7 @@ export default abstract class BaseComponent extends Mesh
     }
     if (!value && this._blinking && !this.blinkAnimationAction.isRunning()) {
       this.blinkAnimationAction.play()
+      this.hideAnimationAction.weight = 0
     }
   }
 
@@ -67,9 +71,12 @@ export default abstract class BaseComponent extends Mesh
   }
 
   public set blinking(value: boolean) {
+    if (this._blinking === value) return
     this._blinking = value
     if (value && !this._hidden && this.animationEnabled) {
       this.blinkAnimationAction.play()
+      this.hideAnimationAction.weight = 0
+      this.blinkAnimationAction.weight = 1
     }
     if (!value && this.blinkAnimationAction.isRunning()) {
       this.blinkAnimationAction.stop()

@@ -4,29 +4,58 @@ import { removeResources } from "@util/utils"
 import BaseGroup from "@item/UI/BaseGroup"
 
 export default class RoomList extends BaseGroup {
+  private name2Room: Map<string, RoomInfo> = new Map()
+
   constructor(viewWidth: number, viewHeight: number) {
     super()
     this.setViewSize(viewWidth, viewHeight)
   }
 
   public set rooms(rooms: Room[]) {
-    removeResources(this)
-    this.remove(...this.children)
-    if (rooms.length === 0) return
-    this.add(...rooms.map(room => new RoomInfo(room)))
+    let newComerRooms: RoomInfo[] = [], existRooms: RoomInfo[] = []
+    rooms.forEach(room => {
+      let roomInfo = this.name2Room.get(room.roomName)
+      if (roomInfo) {
+        existRooms.push(roomInfo)
+        this.name2Room.delete(room.roomName)
+      } else {
+        newComerRooms.push(new RoomInfo(room))
+      }
+    })
+    
+    this.name2Room.forEach(roomInfo => {
+      this.remove(roomInfo)
+      removeResources(roomInfo)
+    })
+    this.name2Room.clear()
+
+    newComerRooms.forEach(roomInfo => {
+      roomInfo.animationEnabled = false
+      roomInfo.hidden = true
+      roomInfo.animationEnabled = true
+      roomInfo.position.set(0, -800, 0)
+      this.name2Room.set(roomInfo.room.roomName, roomInfo)
+      this.add(roomInfo)
+    })
+    existRooms.forEach(roomInfo => {
+      this.name2Room.set(roomInfo.room.roomName, roomInfo)
+    })
+
     this.rearrange()
   }
 
   public rearrange(): void {
     let colNum = Math.floor((this.width + 40) / 380)
     let startX = -this.width / 2 + 10, startY = this.height / 2 - 140
-    for (let i = 0; i < this.children.length; i++) {
-      this.children[i].position.set(
-        startX + (i % colNum) * 380,
-        startY - Math.floor(i / colNum) * 140,
+    let roomInfos = this.children as RoomInfo[]
+    roomInfos.forEach((roomInfo, index) => {
+      if (roomInfo.hidden) roomInfo.hidden = false
+      roomInfo.slideTo(
+        startX + (index % colNum) * 380,
+        startY - Math.floor(index / colNum) * 140,
         0
       )
-    }
+    })
   }
 
   public set viewWidth(width: number) {
