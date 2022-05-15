@@ -42,8 +42,8 @@ export default class ThreeJsStage implements Stage {
     window.addEventListener("resize", this.handleResize.bind(this))
     window.addEventListener("blur", this.handleWindowBlur.bind(this))
     window.addEventListener("focus", this.handleWindowFocus.bind(this))
-    window.addEventListener("pointermove", this.handlePointerMove.bind(this))
-    window.addEventListener("pointerdown", this.handlePointerDown.bind(this))
+    this.canvas.on("pointermove", e => this.handlePointerMove(e.originalEvent as PointerEvent))
+    this.canvas.on("pointerdown", this.handlePointerDown.bind(this))
 
     // Three.js场景初始化
     this.scene = new Scene()
@@ -84,7 +84,7 @@ export default class ThreeJsStage implements Stage {
   }
 
   public async focusRoom(room: Room): Promise<void> {
-    this.roomTitle[0].dataset.position = "top"
+    // this.roomTitle[0].dataset.position = "top"
     await this.rearrangePromise
     await this.roomList.focus(room.roomName)
   }

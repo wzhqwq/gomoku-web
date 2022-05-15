@@ -24,7 +24,7 @@ export default class RoomController {
   constructor() {
     eventDispatcher.listen("selectRoom", this.enterRoom)
     eventDispatcher.listen("createRoom", this.createRoom)
-    eventDispatcher.listen("fetchRooms", this.fetchRooms)
+    eventDispatcher.listen("fetchRooms", () => this.fetchRooms())
     eventDispatcher.listen("doCreateRoom", this.doCreateRoom)
   }
 
@@ -33,7 +33,7 @@ export default class RoomController {
     this.stage.enterRoomPage()
   }
 
-  public fetchRooms = async (): Promise<Room[]> => {
+  public fetchRooms = async (updateStage: boolean = true): Promise<Room[]> => {
     this.stage.roomListLoading = true
     const data = await $.get({
       url: "http://" + G.setting.serverUrl + "/game/listGames",
@@ -43,7 +43,7 @@ export default class RoomController {
     }) as { data: any[] }
     this.rooms = data.data.map(raw => Room.fromRawObject(raw))
     this.stage.roomListLoading = false
-    this.stage.rooms = this.rooms
+    if (updateStage) this.stage.rooms = this.rooms
     return this.rooms
   }
 
@@ -84,8 +84,15 @@ export default class RoomController {
         return
       }
       this.newRoom.hideModal()
-      this.fetchRooms().then(rooms => {
-        this.doEnterRoom(rooms.find(room => room.roomName === info.roomName))
+      this.fetchRooms(false).then(rooms => {
+        G.currentRoom = rooms.find(room => room.roomName === info.roomName)
+        this.stage.rooms = rooms
+        if (!G.currentRoom) return
+        this.stage.focusRoom(G.currentRoom)
+
+        if (G.currentRoom.players.length === 2) {
+          this.doEnterRoom(G.currentRoom)
+        }
       })
     })
   }

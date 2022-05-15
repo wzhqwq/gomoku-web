@@ -65,7 +65,6 @@ export default class RoomList extends BaseGroup {
     if (roomInfo) {
       this.name2Room.forEach((roomInfo, name) => {
         if (name === roomName) return
-        console.log(name)
         roomInfo.hidden = true
       })
       await roomInfo.slideTo(-roomInfo.width / 2, -roomInfo.height / 2, 100)

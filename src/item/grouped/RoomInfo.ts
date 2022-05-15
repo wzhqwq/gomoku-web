@@ -11,6 +11,7 @@ import RoundRectButton from "@item/UI/RoundRectButton"
 import { primaryColor, primaryDarkColor } from "@util/constants"
 import BaseGroup from "@item/UI/BaseGroup"
 import Versus from "@item/basic/Versus"
+import BoardFace from "@item/UI/BoardFace"
 
 export default class RoomInfo extends BaseGroup {
   private boardFace: Mesh
@@ -23,38 +24,25 @@ export default class RoomInfo extends BaseGroup {
 
   public room: Room
 
-  constructor(room: Room, createBySelf: boolean = false) {
+  constructor(room: Room) {
     super()
     this.width = 350
     this.height = 120
 
     // 绘制棋盘预览
-    let boardFaceTexture = G.boardFaces.find(
-      face => face.size === room.size
-    ).texture
-    const faceRect = new PlaneBufferGeometry(120, 120)
-    const faceMaterial = new MeshBasicMaterial({
-      map: boardFaceTexture,
-      transparent: true
-    })
-    this.boardFace = new Mesh(faceRect, faceMaterial)
+    this.boardFace = new BoardFace(room.size)
     this.boardFace.position.set(60, 60, 0)
     this.add(this.boardFace)
 
     // 绘制房间名称
     this.gameName = new RoundRectText({ content: room.roomName, size: 26, maxWidth: 220 })
-    this.gameName.setPositionByAnchor(
-      "bottomLeft",
-      130,
-      120 - this.gameName.height,
-      0
-    )
+    this.gameName.setPositionByAnchor("bottomLeft", 130, 120 - this.gameName.height, 0)
     this.add(this.gameName)
 
-    this.repaintInfo(room, createBySelf)
+    this.repaintInfo(room)
   }
 
-  public repaintInfo(room: Room, createBySelf: boolean = false) {
+  public repaintInfo(room: Room) {
     this.room = room
 
     let startY = 115 - this.gameName.height
@@ -68,18 +56,20 @@ export default class RoomInfo extends BaseGroup {
     else if (room.players.length !== this.lastPlayersLength) {
       this.playersInfo.repaintInfo(room.players)
     }
+    this.lastPlayersLength = room.players.length
     startY -= this.playersInfo.height + 5
 
     // 绘制操作区域，以下四个函数可以在状态没有发生变化时不做任何事情
     let hasMe = room.players.some(p => p.name === G.me.name && !p.online)
+    let selfCreated = !room.isGameStarted && room.roomName === G.currentRoom?.roomName
 
-    if (!room.isGameStarted || hasMe) {
-      // 可以加入
-      this.drawEnterGame(130, startY, room)
-    }
-    else if (createBySelf) {
+    if (selfCreated) {
       // 自己创建的房间，等待玩家加入
       this.drawWaitForOpponent(130, startY)
+    }
+    else if (!room.isGameStarted || hasMe) {
+      // 可以加入
+      this.drawEnterGame(130, startY, room)
     }
     else if (room.isGameOver) {
       // 游戏结束
@@ -92,7 +82,7 @@ export default class RoomInfo extends BaseGroup {
   }
 
   private drawEnterGame(x: number, y: number, room: Room) {
-    if (this.lastBottomState == 0) return
+    if (this.lastBottomState === 0) return
     this.lastBottomState = 0
 
     let hasMe = room.players.some(p => p.name === G.me.name && !p.online)
@@ -137,7 +127,7 @@ export default class RoomInfo extends BaseGroup {
   }
 
   private drawWaitForOpponent(x: number, y: number) {
-    if (this.lastBottomState == 1) return
+    if (this.lastBottomState === 1) return
     this.lastBottomState = 1
     
     this.bottomArea = new RoundRectText({
@@ -154,7 +144,7 @@ export default class RoomInfo extends BaseGroup {
   }
 
   private intoPlayingState(x: number, y: number) {
-    if (this.lastBottomState == 2) return
+    if (this.lastBottomState === 2) return
     this.lastBottomState = 2
     
     let isChange = this.bottomArea !== null
@@ -183,7 +173,7 @@ export default class RoomInfo extends BaseGroup {
   }
 
   private intoEndedState(x: number, y: number) {
-    if (this.lastBottomState == 3) return
+    if (this.lastBottomState === 3) return
     this.lastBottomState = 3
     
     let isChange = this.bottomArea !== null
@@ -234,7 +224,7 @@ class PlayersInfo extends BaseGroup {
         this.emptyPlayer.blinking = false
         this.emptyPlayer.hidden = true
       }
-      
+
       let versus = new Versus()
       versus.position.set(this.player1.width - 10, 8, 0)
       this.add(versus)
