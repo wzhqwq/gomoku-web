@@ -64,6 +64,9 @@ export default abstract class BaseComponent extends Mesh
       this.blinkAnimationAction.play()
       this.hideAnimationAction.weight = 0
     }
+    if (this._blinking && !value) {
+      this.blinkAnimationAction.time = 0.8
+    }
   }
 
   public get hidden(): boolean {
