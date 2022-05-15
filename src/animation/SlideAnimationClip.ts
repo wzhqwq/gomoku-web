@@ -10,9 +10,10 @@ export default class SlideAnimationClip extends AnimationClip {
 
 class SlideTrack extends VectorKeyframeTrack {
   constructor(duration: number, from: Vector3, to: Vector3, nodeFinder: string) {
+    let center = from.clone().multiplyScalar(0.2).add(to.clone().multiplyScalar(0.8))
     let timeline = [
       ...from.toArray(),
-      ...from.multiplyScalar(0.2).add(to.clone().multiplyScalar(0.8)).toArray(),
+      ...center.toArray(),
       ...to.toArray()
     ]
     super(nodeFinder + ".position", [0, duration / 2, duration], timeline, InterpolateSmooth)
