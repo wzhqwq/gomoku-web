@@ -2,8 +2,8 @@ import Room from "@model/base/Room"
 
 export default interface AbstractStage {
   enterRoomPage(): void
-  leaveRoomPage(): void
-  focusRoom(room: Room): void
+  focusRoom(room: Room): Promise<void>
+  updateRoom(room: Room): void
 
   enterGame(): void
   leaveGame(): void

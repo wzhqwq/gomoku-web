@@ -5,6 +5,7 @@ import BaseGroup from "@item/UI/BaseGroup"
 
 export default class RoomList extends BaseGroup {
   private name2Room: Map<string, RoomInfo> = new Map()
+  private focusing: boolean = false
 
   constructor() {
     super()
@@ -30,9 +31,7 @@ export default class RoomList extends BaseGroup {
     this.name2Room.clear()
 
     newComerRooms.forEach(roomInfo => {
-      roomInfo.animationEnabled = false
-      roomInfo.hidden = true
-      roomInfo.animationEnabled = true
+      roomInfo.setHiddenImmediately(true)
       roomInfo.position.set(0, -800, 0)
       this.name2Room.set(roomInfo.room.roomName, roomInfo)
       this.add(roomInfo)
@@ -45,6 +44,7 @@ export default class RoomList extends BaseGroup {
   }
 
   public async rearrange(): Promise<void> {
+    if (this.focusing) return
     let colNum = Math.floor((this.width + 40) / 380)
     let startX = -this.width / 2 + 10, startY = this.height / 2 - 140
     let roomInfos = this.children as RoomInfo[]
@@ -68,9 +68,22 @@ export default class RoomList extends BaseGroup {
         roomInfo.hidden = true
       })
       await roomInfo.slideTo(-roomInfo.width / 2, -roomInfo.height / 2, 100)
+      this.focusing = true
       return true
     }
     return false
+  }
+
+  public unfocus(): void {
+    this.focusing = false
+    this.rearrange()
+  }
+
+  public updateRoom(room: Room) {
+    let roomInfo = this.name2Room.get(room.roomName)
+    if (roomInfo) {
+      roomInfo.repaintInfo(room)
+    }
   }
 
   public set viewWidth(width: number) {

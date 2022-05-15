@@ -95,41 +95,38 @@ export default class RoomInfo extends BaseGroup {
       exactWidth: 220,
     })
     requesting.setPositionByAnchor("bottomLeft", x, y - requesting.height, 0)
-    requesting.animationEnabled = false
-    requesting.hidden = true
-    requesting.animationEnabled = true
-    this.add(requesting)
-    
-    this.bottomArea = new RoundRectButton({
+
+    let button = new RoundRectButton({
       content: hasMe ? "重新加入游戏" : "加入游戏",
       size: 16,
       bgColor: primaryColor,
       exactWidth: 220,
       onClick: () => {
-        this.bottomArea.hidden = true
-        requesting.hidden = false
+        button.setHiddenImmediately(true)
+        requesting.setHiddenImmediately(false)
         requesting.blinking = true
-        eventDispatcher.dispatch("selectRoom", new RoomSelectEvent(
-          room,
-          (success: boolean) => {
-            requesting.blinking = false
-            requesting.hidden = true
-            if (!success) {
-              this.bottomArea.hidden = false
-            }
-          }
-        ))
+        this.bottomArea = requesting
+        eventDispatcher.dispatch("selectRoom", new RoomSelectEvent(room))
       }
     })
-    this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
+    button.setPositionByAnchor("bottomLeft", x, y - button.height, 0)
 
-    this.add(this.bottomArea)
+    this.bottomArea = button
+
+    this.add(requesting)
+    this.add(button)
   }
 
   private drawWaitForOpponent(x: number, y: number) {
     if (this.lastBottomState === 1) return
     this.lastBottomState = 1
     
+    let isChange = this.bottomArea !== null
+    if (isChange) {
+      this.bottomArea.blinking = false
+      this.bottomArea.setHiddenImmediately(true)
+    }
+
     this.bottomArea = new RoundRectText({
       content: "等待玩家加入...",
       size: 16,
@@ -137,7 +134,11 @@ export default class RoomInfo extends BaseGroup {
       color: "#ddd",
       exactWidth: 220,
     })
+    
     this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
+    if (isChange) {
+      this.bottomArea.setHiddenImmediately(false)
+    }
     this.bottomArea.blinking = true
 
     this.add(this.bottomArea)
@@ -150,7 +151,7 @@ export default class RoomInfo extends BaseGroup {
     let isChange = this.bottomArea !== null
     if (isChange) {
       this.bottomArea.blinking = false
-      this.bottomArea.hidden = true
+      this.bottomArea.setHiddenImmediately(true)
     }
 
     this.bottomArea = new RoundRectText({
@@ -163,10 +164,7 @@ export default class RoomInfo extends BaseGroup {
 
     this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
     if (isChange) {
-      this.bottomArea.animationEnabled = false
-      this.bottomArea.hidden = true
-      this.bottomArea.animationEnabled = true
-      this.bottomArea.hidden = false
+      this.bottomArea.setHiddenImmediately(false)
     }
 
     this.add(this.bottomArea)
@@ -179,7 +177,7 @@ export default class RoomInfo extends BaseGroup {
     let isChange = this.bottomArea !== null
     if (isChange) {
       this.bottomArea.blinking = false
-      this.bottomArea.hidden = true
+      this.bottomArea.setHiddenImmediately(true)
     }
 
     this.bottomArea = new RoundRectText({
@@ -192,10 +190,7 @@ export default class RoomInfo extends BaseGroup {
 
     this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
     if (isChange) {
-      this.bottomArea.animationEnabled = false
-      this.bottomArea.hidden = true
-      this.bottomArea.animationEnabled = true
-      this.bottomArea.hidden = false
+      this.bottomArea.setHiddenImmediately(false)
     }
 
     this.add(this.bottomArea)
@@ -220,22 +215,29 @@ class PlayersInfo extends BaseGroup {
 
   public repaintInfo(players: Player[]) {
     if (players.length === 2) {
+      let versus = new Versus()
+
       if (this.emptyPlayer) {
         this.emptyPlayer.blinking = false
-        this.emptyPlayer.hidden = true
+        this.emptyPlayer.setHiddenImmediately(true)
+        versus.position.set(this.player1.width - 10, 8, 200)
+        versus.setHiddenImmediately(true)
+        versus.hidden = false
+        versus.slideTo(this.player1.width - 10, 8, 0)
+      }
+      else {
+        versus.position.set(this.player1.width - 10, 8, 0)
       }
 
-      let versus = new Versus()
-      versus.position.set(this.player1.width - 10, 8, 0)
       this.add(versus)
 
-      let player2 = new RoundRectText({ content: players[1].name, maxWidth: 100 })
+      let player2 = new RoundRectText({
+        content: players[1].name,
+        maxWidth: 100,
+      })
       player2.setPositionByAnchor("bottomLeft", this.player1.width + 20, 0, 0)
       this.add(player2)
       if (this.emptyPlayer) {
-        player2.animationEnabled = false
-        player2.hidden = true
-        player2.animationEnabled = true
         player2.hidden = false
       }
       this.width = this.player1.width + player2.width + 20

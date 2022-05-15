@@ -1,12 +1,14 @@
+import BaseComponent from "@item/UI/BaseComponent"
 import G from "@util/global"
-import { Mesh, MeshMatcapMaterial } from "three"
+import { BufferGeometry, Material, MeshMatcapMaterial } from "three"
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry"
 
-export default class Versus extends Mesh {
+export default class Versus extends BaseComponent {
   private static cachedGeometry: TextGeometry
   private static cachedMaterial: MeshMatcapMaterial
 
   constructor() {
+    super()
     if (!Versus.cachedGeometry) {
       Versus.cachedGeometry = new TextGeometry("VS", {
         font: G.fonts.hugeFont,
@@ -21,8 +23,23 @@ export default class Versus extends Mesh {
     if (!Versus.cachedMaterial) {
       Versus.cachedMaterial = new MeshMatcapMaterial({
         matcap: G.matcaps.vs,
+        transparent: true,
       })
     }
-    super(Versus.cachedGeometry, Versus.cachedMaterial)
+
+    this.buildMesh()
+  }
+
+  protected calculateSize(): void {
+    this.width = 40
+    this.height = 24
+  }
+
+  protected getMaterial(): Material {
+    return Versus.cachedMaterial
+  }
+
+  protected getGeometry(): BufferGeometry {
+    return Versus.cachedGeometry
   }
 }

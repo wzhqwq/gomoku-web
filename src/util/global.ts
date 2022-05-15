@@ -17,6 +17,7 @@ import ChessboardInterceptor from "@interceptor/ChessBoardInterceptor"
 import WebSocketClient from "./WebSocketClient"
 import { boardStyles } from "./constants"
 import Fonts from "./Fonts"
+import RoomInterceptor from "@interceptor/RoomInterceptor"
 
 type BoardFaceInfo = {
   size: number
@@ -111,6 +112,7 @@ class Global {
       this._interceptors = [
         new RawInterceptor(),
         new ErrorInterceptor(),
+        new RoomInterceptor(),
         new ChessboardInterceptor(),
       ]
     }

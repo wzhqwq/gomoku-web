@@ -25,7 +25,7 @@ export default class NewRoom extends Modal {
     $("#btn-confirm-new-room").on("click", () =>
       eventDispatcher.dispatch("doCreateRoom", new DoCreateRoomEvent({
         roomName: this.roomInput.val() as string,
-        size: this.boardSizeRadios.find(radio => radio.prop("checked")).val() as number,
+        size: parseInt(this.boardSizeRadios.find(radio => radio.prop("checked")).val() as string),
       }))
     )
     $("#btn-cancel-new-room").on("click", () => eventDispatcher.dispatch("doCreateRoom", null))

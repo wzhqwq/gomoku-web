@@ -85,16 +85,10 @@ export default class ThreeJsStage implements Stage {
 
   public async focusRoom(room: Room): Promise<void> {
     // this.roomTitle[0].dataset.position = "top"
-    await this.rearrangePromise
+    if (this.rearrangePromise) {
+      await this.rearrangePromise
+    }
     await this.roomList.focus(room.roomName)
-  }
-
-  public enterGame(): void {
-    
-  }
-
-  public leaveGame(): void {
-    throw new Error("Method not implemented.")
   }
 
   public set rooms(rooms: Room[]) {
@@ -104,6 +98,20 @@ export default class ThreeJsStage implements Stage {
   public set roomListLoading(loading: boolean) {
     this.roomRefreshButton.text(loading ? "加载中" : "刷新列表")
     this.roomRefreshButton[0].disabled = loading
+  }
+
+  public updateRoom(room: Room) {
+    this.roomList.updateRoom(room)
+  }
+
+
+
+  public enterGame(): void {
+    this.roomList.hidden = true
+  }
+
+  public leaveGame(): void {
+    this.roomList.hidden = false
   }
 
   // 私有方法
@@ -136,7 +144,7 @@ export default class ThreeJsStage implements Stage {
   }
 
   private handleWindowBlur(): void {
-    this.renderRunning = false
+    // this.renderRunning = false
   }
 
   private handleWindowFocus(): void {

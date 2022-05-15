@@ -21,6 +21,9 @@ export default class RoomController {
   private newRoom: NewRoom = G.newRoom
   private userInput: UserInput = G.userInput
 
+  // promises
+  private focusRoomPromise: Promise<void>
+
   constructor() {
     eventDispatcher.listen("selectRoom", this.enterRoom)
     eventDispatcher.listen("createRoom", this.createRoom)
@@ -28,12 +31,12 @@ export default class RoomController {
     eventDispatcher.listen("doCreateRoom", this.doCreateRoom)
   }
 
-  public startRoom = () => {
+  public startRoom() {
     this.fetchRooms()
     this.stage.enterRoomPage()
   }
 
-  public fetchRooms = async (updateStage: boolean = true): Promise<Room[]> => {
+  public async fetchRooms(updateStage: boolean = true): Promise<Room[]> {
     this.stage.roomListLoading = true
     const data = await $.get({
       url: "http://" + G.setting.serverUrl + "/game/listGames",
@@ -62,10 +65,33 @@ export default class RoomController {
       return
     }
     this.newRoom.hideError()
-    G.WSClient.connect(
-      Room.createRoom(info.roomName, info.size),
-      G.interceptors
-    ).then(message => {
+    this.newRoom.hideModal()
+    this.doEnterRoom(Room.createRoom(info.roomName, info.size))
+  }
+
+  public enterRoom = (e: SelectRoomEvent) => {
+    this.doEnterRoom(e.detail.roomSelected)
+  }
+
+  public updateRoom(room: Room) {
+    this.stage.updateRoom(room)
+    console.log(room)
+    if (room.isGameStarted) {
+      setTimeout(() => {
+        this.stage.enterGame()
+      }, 1000);
+    }
+  }
+
+  private async doEnterRoom(roomToEnter: Room) {
+    G.currentRoom = roomToEnter
+    if (!this.rooms.some(room => room.roomName === roomToEnter.roomName)) {
+      this.rooms = [...this.rooms, roomToEnter]
+      this.stage.rooms = this.rooms
+    }
+    this.focusRoomPromise = this.stage.focusRoom(roomToEnter)
+
+    G.WSClient.connect(roomToEnter, G.interceptors).then(message => {
       if (message instanceof ErrorMessage) {
         switch (message.detail) {
           case ErrorDetail.HeaderNotSet:
@@ -78,31 +104,14 @@ export default class RoomController {
             this.updateSetting()
             break
           case ErrorDetail.RoomIsFull:
+            this.newRoom.showModal()
             this.newRoom.showError("您当前要加入的房间已满")
             break
         }
+        this.fetchRooms()
         return
       }
-      this.newRoom.hideModal()
-      this.fetchRooms(false).then(rooms => {
-        G.currentRoom = rooms.find(room => room.roomName === info.roomName)
-        this.stage.rooms = rooms
-        if (!G.currentRoom) return
-        this.stage.focusRoom(G.currentRoom)
-
-        if (G.currentRoom.players.length === 2) {
-          this.doEnterRoom(G.currentRoom)
-        }
-      })
     })
-  }
-
-  public enterRoom = (e: SelectRoomEvent) => {
-    this.doEnterRoom(e.detail.roomSelected)
-  }
-
-  private async doEnterRoom(room: Room) {
-    this.stage.focusRoom(room)
   }
 
   private updateSetting = async (): Promise<boolean> => {
@@ -110,7 +119,10 @@ export default class RoomController {
       G.setting.nickname,
       G.setting.serverUrl
     )
-    if (!settings) return false
+    if (!settings) {
+      this.userInput.hideModal()
+      return false
+    }
 
     if (settings[1].match(/\/$/)) {
       settings[1] = settings[1].slice(0, -1)

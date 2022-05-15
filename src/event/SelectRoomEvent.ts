@@ -5,12 +5,11 @@ export default class SelectRoomEvent implements BaseEvent {
   public TYPE = Symbol("SelectRoomEvent")
   public detail: RoomSelectEventDetail
 
-  constructor(roomSelected: Room, finishCallback: (success: boolean) => void) {
-    this.detail = { roomSelected, finishCallback }
+  constructor(roomSelected: Room) {
+    this.detail = { roomSelected }
   }
 }
 
 type RoomSelectEventDetail = {
   roomSelected: Room
-  finishCallback: (success: boolean) => void
 }

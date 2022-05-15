@@ -10,7 +10,7 @@ import SlidingComponent from "./SlidingComponent"
 export default class BaseGroup extends Group
     implements AnimatedComponent, HidableComponent, SizedComponent, SlidingComponent {
   public animationMixer: AnimationMixer
-  public animationEnabled: boolean
+  public animationEnabled: boolean = true
   public width: number
   public height: number
 
@@ -18,6 +18,7 @@ export default class BaseGroup extends Group
   private slideResolvers: ((value?: void | PromiseLike<void>) => void)[] = []
 
   private _hidden: boolean = false
+  private parentHidden: boolean = false
   
   private slideEnd: Vector3 = null
   private latestSlideEnd: Vector3 = null
@@ -33,15 +34,30 @@ export default class BaseGroup extends Group
   public set hidden(hidden: boolean) {
     if (this._hidden === hidden) return
     this._hidden = hidden
+    this.doSetVisibility(this.parentHidden || this._hidden, !this.animationEnabled)
+  }
+
+  public setHiddenImmediately(hidden: boolean): void {
+    if (this._hidden === hidden) return
+    this._hidden = hidden
+    this.doSetVisibility(this.parentHidden || this._hidden, true)
+  }
+
+  public passVisibility(hidden: boolean, immediately: boolean): void {
+    this.parentHidden = hidden
+    this.doSetVisibility(this.parentHidden || this._hidden, immediately)
+  }
+
+  private doSetVisibility(hidden: boolean, immediately: boolean) {
     this.children.forEach((child: Object3D) => {
       if (!(child instanceof BaseComponent) && !(child instanceof BaseGroup)) return
       child.animationEnabled = this.animationEnabled
-      child.hidden = hidden
+      child.passVisibility(hidden, immediately)
     })
   }
 
   public get hidden(): boolean {
-    return this._hidden
+    return this._hidden || this.parentHidden
   }
 
   public setPositionByAnchor(
