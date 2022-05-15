@@ -67,7 +67,7 @@ export default class RoomList extends BaseGroup {
         if (name === roomName) return
         roomInfo.hidden = true
       })
-      await roomInfo.slideTo(-roomInfo.width / 2, -roomInfo.height / 2, 100)
+      await roomInfo.slideTo(-60, -60, 100)
       this.focusing = true
       return true
     }

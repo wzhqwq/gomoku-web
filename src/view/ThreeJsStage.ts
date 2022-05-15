@@ -1,11 +1,15 @@
 import * as $ from "jquery"
-import { AmbientLight, Clock, Matrix3, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneBufferGeometry, Raycaster, Renderer, Scene, Vector3, WebGLRenderer } from "three"
+import { AmbientLight, AnimationAction, AnimationMixer, Clock, LoopOnce, Matrix3, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneBufferGeometry, Raycaster, Renderer, Scene, Vector3, WebGLRenderer } from "three"
 import RoomList from "@item/grouped/RoomList"
 import Room from "@model/base/Room"
 import eventDispatcher from "@event/eventDispatcher"
 import G from "@util/global"
 import { CreateRoomEvent, FetchRoomEvent } from "@event/emptyEvents"
 import Stage from "./AbstractStage"
+import ChessBoard from "@item/basic/ChessBoard"
+import { boardStyles, matrixGap } from "@util/constants"
+import SlideAnimationClip, { SlideTrack } from "@animation/SlideAnimationClip"
+import IndicatorChangedEvent from "@event/IndicatorChangedEvent"
 
 export default class ThreeJsStage implements Stage {
   // DOM
@@ -23,10 +27,19 @@ export default class ThreeJsStage implements Stage {
   private clock: Clock
 
   private roomList: RoomList
+  private board: ChessBoard
 
   private renderRunning: boolean
   private lastHoveredUuid: string
   private rearrangePromise: Promise<void>
+
+  private cameraSlideActions: AnimationAction[] = []
+  private cameraSlideMixer: AnimationMixer
+  private cameraMoving: boolean = false
+  private lookAt: Vector3
+
+  private lastX: number
+  private lastY: number
 
   constructor() {
     this.roomTitle = $("#room-title")
@@ -56,7 +69,7 @@ export default class ThreeJsStage implements Stage {
       60,
       window.innerWidth / window.innerHeight,
       1,
-      1000
+      3000
     )
     this.camera.position.set(0, 0, 600)
     this.camera.lookAt(0, 0, 0)
@@ -67,6 +80,18 @@ export default class ThreeJsStage implements Stage {
     // 开始渲染
     this.renderRunning = true
     this.render()
+
+    // 预处理时间轴
+    this.cameraSlideMixer = new AnimationMixer(this.camera)
+    boardStyles.forEach(style => {
+      this.cameraSlideActions.push(
+        this.cameraSlideMixer.clipAction(
+          new SlideAnimationClip(0.8, this.camera.position, style.cameraPosition)
+        ).setLoop(LoopOnce, 1)
+      )
+    })
+    this.cameraSlideActions.forEach(action => action.clampWhenFinished = true)
+    this.cameraSlideMixer.addEventListener("finished", this.handleCameraSlideEnd)
   }
 
   // 控制方法
@@ -107,7 +132,23 @@ export default class ThreeJsStage implements Stage {
 
 
   public enterGame(): void {
+    let size = G.currentRoom.size, index = boardStyles.map(style => style.size).indexOf(size)
+    let config = boardStyles[index]
+    let cameraAction = this.cameraSlideActions[index]
+    this.board = G.chessBoards[index]
+    this.scene.add(this.board)
     this.roomList.hidden = true
+    this.lookAt = new Vector3(50, 0, config.positionZ - 100)
+    setTimeout(() => {
+      this.cameraMoving = true
+      cameraAction.play()
+    }, 200);
+  }
+
+  public setIndicator(x: number, y: number) {
+    if (this.board) {
+      this.board.setIndicator(x, y)
+    }
   }
 
   public leaveGame(): void {
@@ -141,6 +182,10 @@ export default class ThreeJsStage implements Stage {
     this.renderer.render(this.scene, this.camera)
     let delta = this.clock.getDelta()
     G.mixers.forEach(mixer => mixer.update(delta))
+    if (this.cameraMoving) {
+      this.cameraSlideMixer.update(delta)
+      this.camera.lookAt(this.lookAt)
+    }
   }
 
   private handleWindowBlur(): void {
@@ -148,8 +193,8 @@ export default class ThreeJsStage implements Stage {
   }
 
   private handleWindowFocus(): void {
-    this.renderRunning = true
-    this.render()
+    // this.renderRunning = true
+    // this.render()
   }
 
   private setLight(): void {
@@ -158,12 +203,12 @@ export default class ThreeJsStage implements Stage {
   }
 
   private handlePointerMove(event: PointerEvent): void {
+    let rayCaster = new Raycaster()
+    rayCaster.setFromCamera({
+      x: ((event.x - 50) / this.canvas.width()) * 2 - 1,
+      y: -((event.y - 100) / this.canvas.height()) * 2 + 1
+    }, this.camera)
     if (G.pointerHandlers.objects.length) {
-      let rayCaster = new Raycaster()
-      rayCaster.setFromCamera({
-        x: ((event.x - 50) / this.canvas.width()) * 2 - 1,
-        y: -((event.y - 100) / this.canvas.height()) * 2 + 1
-      }, this.camera)
       let intersects = rayCaster.intersectObjects(G.pointerHandlers.objects)
         .map(intersect => intersect.object.uuid)[0]
       if (this.lastHoveredUuid && (!intersects || intersects !== this.lastHoveredUuid)) {
@@ -173,6 +218,22 @@ export default class ThreeJsStage implements Stage {
         G.pointerHandlers.get(intersects).callback("hover")
       }
       this.lastHoveredUuid = intersects
+    }
+    if (this.board) {
+      let intersects = rayCaster.intersectObjects([this.board])
+      if (intersects.length) {
+        let { x, y } = intersects[0].point
+        let offset = matrixGap * (G.currentRoom.size - 1) / 2
+        if (Math.abs(x) <= offset + matrixGap / 2 && Math.abs(y) <= offset + matrixGap / 2) {
+          x = Math.max(0, Math.round((x + offset) / matrixGap))
+          y = Math.max(0, Math.round((y + offset) / matrixGap))
+          if (x !== this.lastX && y !== this.lastY) {
+            this.lastX = x
+            this.lastY = y
+            eventDispatcher.dispatch("indicatorChanged", new IndicatorChangedEvent(x, y))
+          }
+        }
+      }
     }
   }
 
@@ -198,5 +259,9 @@ export default class ThreeJsStage implements Stage {
         }
       }
     }
+  }
+
+  private handleCameraSlideEnd = (): void => {
+    this.cameraMoving = false
   }
 }

@@ -1,18 +1,31 @@
+import { Vector3 } from "three"
+
 export const boardStyles = [
   {
     size: 10,
-    color: "#0077cb"
+    color: "#0077cb",
+    positionZ: -300,
+    cameraPosition: new Vector3(0, -100, -500)
   }, {
     size: 15,
-    color: "#af7900"
+    color: "#af7900",
+    positionZ: -500,
+    cameraPosition: new Vector3(0, -100, -500)
   }, {
     size: 20,
-    color: "#cb002f"
+    color: "#cb002f",
+    positionZ: -1500,
+    cameraPosition: new Vector3(50, -300, -1200)
   }
 ]
 
 export const primaryColor = "#1878a8"
 export const primaryDarkColor = "#092f42"
+
+export const matrixGap = 20
+export const matrixLineWidth = 2
+export const boardPadding = 40
+export const boardRadius = 15
 
 export enum ErrorDetail {
   // WebSocket握手阶段发生错误

@@ -1,6 +1,7 @@
 import BaseEvent from "./BaseEvent"
 import DoCreateRoomEvent from "./DoCreateRoomEvent"
 import { CreateRoomEvent, FetchRoomEvent } from "./emptyEvents"
+import IndicatorChangedEvent from "./IndicatorChangedEvent"
 import SelectRoomEvent from "./SelectRoomEvent"
 
 export interface EventMap {
@@ -8,6 +9,7 @@ export interface EventMap {
   createRoom: CreateRoomEvent
   fetchRooms: FetchRoomEvent
   doCreateRoom: DoCreateRoomEvent
+  indicatorChanged: IndicatorChangedEvent
 }
 
 export type EventNameType = keyof EventMap

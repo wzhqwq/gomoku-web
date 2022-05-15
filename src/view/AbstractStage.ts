@@ -7,6 +7,7 @@ export default interface AbstractStage {
 
   enterGame(): void
   leaveGame(): void
+  setIndicator(x: number, y: number): void
 
   set rooms(rooms: Room[])
   set roomListLoading(loading: boolean)

@@ -12,6 +12,7 @@ import UserInput from "@view/UserInput"
 import Setting from "@model/local/Setting"
 import Player from "@model/base/Player"
 import DoCreateRoomEvent from "@event/DoCreateRoomEvent"
+import IndicatorChangedEvent from "@event/IndicatorChangedEvent"
 
 export default class RoomController {
   private rooms: Room[]
@@ -29,6 +30,7 @@ export default class RoomController {
     eventDispatcher.listen("createRoom", this.createRoom)
     eventDispatcher.listen("fetchRooms", () => this.fetchRooms())
     eventDispatcher.listen("doCreateRoom", this.doCreateRoom)
+    eventDispatcher.listen("indicatorChanged", this.chessBoardIndicatorChanged)
   }
 
   public startRoom() {
@@ -79,8 +81,12 @@ export default class RoomController {
     if (room.isGameStarted) {
       setTimeout(() => {
         this.stage.enterGame()
-      }, 1000);
+      }, 500);
     }
+  }
+
+  public chessBoardIndicatorChanged = (e: IndicatorChangedEvent): void => {
+    this.stage.setIndicator(e.detail.x, e.detail.y)
   }
 
   private async doEnterRoom(roomToEnter: Room) {

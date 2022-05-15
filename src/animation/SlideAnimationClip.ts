@@ -8,7 +8,7 @@ export default class SlideAnimationClip extends AnimationClip {
 
 // a + b * 4 / 5 - a * 4 / 5
 
-class SlideTrack extends VectorKeyframeTrack {
+export class SlideTrack extends VectorKeyframeTrack {
   constructor(duration: number, from: Vector3, to: Vector3, nodeFinder: string) {
     let center = from.clone().multiplyScalar(0.2).add(to.clone().multiplyScalar(0.8))
     let timeline = [

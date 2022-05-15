@@ -18,6 +18,7 @@ import WebSocketClient from "./WebSocketClient"
 import { boardStyles } from "./constants"
 import Fonts from "./Fonts"
 import RoomInterceptor from "@interceptor/RoomInterceptor"
+import ChessBoard from "@item/basic/ChessBoard"
 
 type BoardFaceInfo = {
   size: number
@@ -38,6 +39,7 @@ class Global {
   // three.js
   private _matcaps: { [key: string]: Texture } = null
   private _boardFaces: BoardFaceInfo[] = null
+  private _chessBoards: ChessBoard[] = null
   public readonly mixers: Map<string, AnimationMixer> = new Map()
   public readonly pointerHandlers: PointerHandlers = new PointerHandlers()
 
@@ -93,6 +95,8 @@ class Global {
       let loader = new TextureLoader()
       this._matcaps = {
         "vs": loader.load("textures/matcap-vs.png"),
+        "board": loader.load("textures/matcap-board.png"),
+        "general": loader.load("textures/matcap-porcelain.jpg"),
       }
     }
     return this._matcaps
@@ -105,6 +109,16 @@ class Global {
       }))
     }
     return this._boardFaces
+  }
+  public get chessBoards(): ChessBoard[] {
+    if (this._chessBoards === null) {
+      this._chessBoards = boardStyles.map(({ size, color, positionZ }) => {
+        let board = new ChessBoard(size)
+        board.position.set(0, 0, positionZ)
+        return board
+      })
+    }
+    return this._chessBoards
   }
 
   public get interceptors(): Interceptor[] {
