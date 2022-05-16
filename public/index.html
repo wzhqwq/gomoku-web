@@ -22,16 +22,20 @@
         <div
           class="move player-panel black"
           id="player-1"
-          data-position="right"
+          data-position="bottom"
         >
+          <div class="piece"></div>
+          <div class="piece-name">黑子</div>
           <div class="player-name"></div>
           <div class="now-holding">的回合</div>
         </div>
         <div
           class="move player-panel white"
           id="player-2"
-          data-position="right"
+          data-position="bottom"
         >
+          <div class="piece"></div>
+          <div class="piece-name">白子</div>
           <div class="player-name"></div>
           <div class="now-holding">的回合</div>
         </div>
@@ -43,15 +47,15 @@
           data-position="bottom"
         >
           <div class="collapse-inner">
-            <div class="btns">
+            <div class="btns full-width">
               <button class="btn btn-danger" id="btn-abort">离开</button>
               <button class="btn btn-primary" id="btn-retract">悔棋</button>
             </div>
           </div>
         </div>
         <!-- 请求悔棋前的确认 以及 收到悔棋时的确认 -->
-        <div class="card collapse" id="confirm-collapse" data-toggle="collapse">
-          <div class="collapse-inner">
+        <div class="collapse" id="confirm-collapse" data-toggle="collapse">
+          <div class="card collapse-inner">
             <div class="card-body" id="confirm-message"></div>
             <div class="btns">
               <button class="btn btn-dark" id="btn-cancel"></button>
@@ -59,7 +63,7 @@
             </div>
           </div>
         </div>
-        <div class="move card" data-position="bottom">
+        <div class="move card" id="message-box-wrapper" data-position="bottom">
           <div class="card-body">
             <div id="message-box"></div>
           </div>

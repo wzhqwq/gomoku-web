@@ -6,8 +6,8 @@ export default class ChessboardMessage implements BaseMessage, BaseRequest {
   public readonly type: string = "chessboard"
 
   constructor(
-    public readonly board: Board,
-    public readonly isMeNow: boolean
+    public readonly board?: Board,
+    public readonly isMeNow?: boolean
   ) {}
 
   public static fromRawObject(rawObject: any): ChessboardMessage {
@@ -15,6 +15,8 @@ export default class ChessboardMessage implements BaseMessage, BaseRequest {
   }
 
   public toJson(): string {
-    throw new Error("Method not implemented.")
+    return JSON.stringify({
+      type: this.type,
+    })
   }
 }
