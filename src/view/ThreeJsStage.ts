@@ -109,7 +109,7 @@ export default class ThreeJsStage implements Stage {
   }
 
   public async focusRoom(room: Room): Promise<void> {
-    // this.roomTitle[0].dataset.position = "top"
+    this.roomTitle[0].dataset.position = "top"
     if (this.rearrangePromise) {
       await this.rearrangePromise
     }

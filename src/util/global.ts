@@ -19,6 +19,8 @@ import { boardStyles } from "./constants"
 import Fonts from "./Fonts"
 import RoomInterceptor from "@interceptor/RoomInterceptor"
 import ChessBoard from "@item/basic/ChessBoard"
+import ControlPanel from "@view/ControlPanel"
+import MessageArea from "@view/MessageArea"
 
 type BoardFaceInfo = {
   size: number
@@ -35,6 +37,8 @@ class Global {
   private _stage: AbstractStage = null
   private _newRoom: NewRoom = null
   private _userInput: UserInput = null
+  private _controlPanel: ControlPanel = null
+  private _messageArea: MessageArea = null
 
   // three.js
   private _matcaps: { [key: string]: Texture } = null
@@ -57,6 +61,7 @@ class Global {
 
   public me: Player = null
   public currentRoom: Room = null
+  public myChessType: number = -1
 
   public get roomController(): RoomController {
     if (this._roomController === null) {
@@ -65,7 +70,7 @@ class Global {
     return this._roomController
   }
   public get gameController(): GameController {
-    if (this.gameController === null) {
+    if (this._gameController === null) {
       this._gameController = new GameController()
     }
     return this._gameController
@@ -88,6 +93,18 @@ class Global {
       this._userInput = new UserInput()
     }
     return this._userInput
+  }
+  public get controlPanel(): ControlPanel {
+    if (this._controlPanel === null) {
+      this._controlPanel = new ControlPanel()
+    }
+    return this._controlPanel
+  }
+  public get messageArea(): MessageArea {
+    if (this._messageArea === null) {
+      this._messageArea = new MessageArea()
+    }
+    return this._messageArea
   }
 
   public get matcaps(): { [key: string]: Texture } {

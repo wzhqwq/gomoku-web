@@ -13,6 +13,7 @@ import Setting from "@model/local/Setting"
 import Player from "@model/base/Player"
 import DoCreateRoomEvent from "@event/DoCreateRoomEvent"
 import IndicatorChangedEvent from "@event/IndicatorChangedEvent"
+import RoomUpdatedEvent from "@event/RoomUpdatedEvent"
 
 export default class RoomController {
   private rooms: Room[]
@@ -30,7 +31,7 @@ export default class RoomController {
     eventDispatcher.listen("createRoom", this.createRoom)
     eventDispatcher.listen("fetchRooms", () => this.fetchRooms())
     eventDispatcher.listen("doCreateRoom", this.doCreateRoom)
-    eventDispatcher.listen("indicatorChanged", this.chessBoardIndicatorChanged)
+    eventDispatcher.listen("roomUpdated", this.updateRoom)
   }
 
   public startRoom() {
@@ -75,18 +76,14 @@ export default class RoomController {
     this.doEnterRoom(e.detail.roomSelected)
   }
 
-  public updateRoom(room: Room) {
+  public updateRoom = (e: RoomUpdatedEvent) => {
+    let room = e.detail
     this.stage.updateRoom(room)
-    console.log(room)
     if (room.isGameStarted) {
       setTimeout(() => {
-        this.stage.enterGame()
+        G.gameController.startGame(room)
       }, 500);
     }
-  }
-
-  public chessBoardIndicatorChanged = (e: IndicatorChangedEvent): void => {
-    this.stage.setIndicator(e.detail.x, e.detail.y)
   }
 
   private async doEnterRoom(roomToEnter: Room) {

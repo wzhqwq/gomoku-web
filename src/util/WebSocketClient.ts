@@ -53,15 +53,16 @@ export default class WebSocketClient {
   }
 
   public send(message: BaseRequest): Promise<BaseMessage | void> {
+    if (this.session === null) {
+      return Promise.resolve()
+    }
     return new Promise(res => {
-      if (this.session === null) {
-        res()
-        return
-      }
       this.session.send(message.toJson())
       this.sendResolver = res
       setTimeout(() => {
-        res(new ErrorMessage("timeout"))
+        if (this.sendResolver) {
+          res(new ErrorMessage("timeout"))
+        }
       }, 10000)
     })
   }
