@@ -90,6 +90,7 @@ export default class RoundRectText extends BaseComponent {
     ctx.fillText(content, this.textPos.x, this.textPos.y)
 
     const texture = new CanvasTexture(this.canvas)
+    texture.needsUpdate = false
     let material = new MeshBasicMaterial({
       map: texture,
       transparent: true

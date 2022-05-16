@@ -27,5 +27,6 @@ export default class BoardInfoTexture extends CanvasTexture {
     ctx.fillText(`${size}×${size}`, 50, 62)
 
     super(canvas)
+    this.needsUpdate = false
   }
 }

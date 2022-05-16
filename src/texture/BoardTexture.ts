@@ -5,10 +5,28 @@ import { boardPadding, matrixGap, matrixLineWidth } from "@util/constants"
 const padding = boardPadding * 2, gap = matrixGap * 2, lineWidth = matrixLineWidth;
 
 export default class BoardTexture extends CanvasTexture {
-  constructor(size: number, indicatorX?: number, indicatorY?: number) {
+  private ctx: CanvasRenderingContext2D
+  private width: number
+
+  constructor(private size: number) {
     let canvas = document.createElement("canvas")
     canvas.width = canvas.height = (size - 1) * gap + 2 * padding
-    let ctx = canvas.getContext("2d")
+    super(canvas)
+
+    this.ctx = canvas.getContext("2d")
+    this.width = canvas.width
+    this.redraw()
+  }
+
+  public drawIndicator(x: number, y: number) {
+    this.redraw(x, y)
+  }
+
+  private redraw(indicatorX?: number, indicatorY?: number) {
+    let ctx = this.ctx
+    let size = this.size
+
+    ctx.clearRect(0, 0, this.width, this.width)
 
     for (let i = 0; i < size; i++) {
       ctx.lineWidth = indicatorX === i ? matrixLineWidth * 2 : matrixLineWidth
@@ -36,7 +54,5 @@ export default class BoardTexture extends CanvasTexture {
         padding + (size - 1) * gap + 24
       )
     }
-
-    super(canvas)
   }
 }

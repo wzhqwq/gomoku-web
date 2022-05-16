@@ -225,12 +225,12 @@ export default class ThreeJsStage implements Stage {
         let { x, y } = intersects[0].point
         let offset = matrixGap * (G.currentRoom.size - 1) / 2
         if (Math.abs(x) <= offset + matrixGap / 2 && Math.abs(y) <= offset + matrixGap / 2) {
-          x = Math.max(0, Math.round((x + offset) / matrixGap))
-          y = Math.max(0, Math.round((y + offset) / matrixGap))
-          if (x !== this.lastX && y !== this.lastY) {
-            this.lastX = x
-            this.lastY = y
-            eventDispatcher.dispatch("indicatorChanged", new IndicatorChangedEvent(x, y))
+          let row = Math.max(0, Math.round((offset + x) / matrixGap))
+          let col = Math.max(0, Math.round((offset - y) / matrixGap))
+          if (col !== this.lastX && row !== this.lastY) {
+            this.lastX = col
+            this.lastY = row
+            eventDispatcher.dispatch("indicatorChanged", new IndicatorChangedEvent(col, row))
           }
         }
       }

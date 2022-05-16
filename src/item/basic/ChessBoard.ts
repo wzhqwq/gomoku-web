@@ -4,7 +4,7 @@ import G from "@util/global";
 import { ExtrudeBufferGeometry, ExtrudeGeometry, Group, Material, Mesh, MeshMatcapMaterial, MeshPhongMaterial, PlaneBufferGeometry, Shape } from "three";
 
 export default class ChessBoard extends Group {
-  private content: Mesh
+  private contentTexture: BoardTexture
 
   constructor(private size: number) {
     super()
@@ -14,11 +14,13 @@ export default class ChessBoard extends Group {
       matcap: G.matcaps.general,
       color: 0xffdb99,
     })
+    this.contentTexture = new BoardTexture(size)
     let contentMaterial = new MeshPhongMaterial({
-      map: new BoardTexture(size),
+      map: this.contentTexture,
       transparent: true,
       specular: 0xffffff,
     })
+
     let shape = new Shape()
     shape.moveTo(0, boardRadius)
     shape.lineTo(0, width - boardRadius)
@@ -29,6 +31,7 @@ export default class ChessBoard extends Group {
     shape.bezierCurveTo(width, 0, width, 0, width - boardRadius, 0)
     shape.lineTo(boardRadius, 0)
     shape.bezierCurveTo(0, 0, 0, 0, 0, boardRadius)
+
     let planeGeometry = new PlaneBufferGeometry(width, width)
     let boxGeometry = new ExtrudeGeometry(shape, {
       depth: 10,
@@ -38,21 +41,16 @@ export default class ChessBoard extends Group {
     })
 
     let base = new Mesh(boxGeometry, baseMaterial)
-    this.content = new Mesh(planeGeometry, contentMaterial)
+    let content = new Mesh(planeGeometry, contentMaterial)
 
     base.position.set(-width / 2, -width / 2, -20.01)
-    this.content.position.set(0, 0, 0)
+    content.position.set(0, 0, 0)
     this.add(base)
-    this.add(this.content)
+    this.add(content)
   }
 
   public setIndicator(x: number, y: number) {
-    (this.content.material as Material).dispose()
-    this.content.material = new MeshPhongMaterial({
-      map: new BoardTexture(this.size, x, y),
-      transparent: true,
-      specular: 0xffffff,
-    })
-    console.log("adsf")
+    this.contentTexture.drawIndicator(x, y)
+    this.contentTexture.needsUpdate = true
   }
 }
