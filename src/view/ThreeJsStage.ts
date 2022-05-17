@@ -10,6 +10,7 @@ import ChessBoard from "@item/basic/ChessBoard"
 import { boardStyles, matrixGap } from "@util/constants"
 import SlideAnimationClip, { SlideTrack } from "@animation/SlideAnimationClip"
 import IndicatorChangedEvent from "@event/IndicatorChangedEvent"
+import Piece from "@item/basic/Piece"
 
 export default class ThreeJsStage implements Stage {
   // DOM
@@ -37,9 +38,6 @@ export default class ThreeJsStage implements Stage {
   private cameraSlideMixer: AnimationMixer
   private cameraMoving: boolean = false
   private lookAt: Vector3
-
-  private lastX: number
-  private lastY: number
 
   constructor() {
     this.roomTitle = $("#room-title")
@@ -209,31 +207,21 @@ export default class ThreeJsStage implements Stage {
       y: -((event.y - 100) / this.canvas.height()) * 2 + 1
     }, this.camera)
     if (G.pointerHandlers.objects.length) {
-      let intersects = rayCaster.intersectObjects(G.pointerHandlers.objects)
-        .map(intersect => intersect.object.uuid)[0]
-      if (this.lastHoveredUuid && (!intersects || intersects !== this.lastHoveredUuid)) {
+      let intersects = rayCaster.intersectObjects(G.pointerHandlers.objects, false)[0]
+      let firstUuid = intersects?.object?.uuid
+      let point = intersects?.point
+      
+      if (this.lastHoveredUuid && (!firstUuid || firstUuid !== this.lastHoveredUuid)) {
         G.pointerHandlers.get(this.lastHoveredUuid).callback("leave")
       }
-      if (intersects && intersects !== this.lastHoveredUuid) {
-        G.pointerHandlers.get(intersects).callback("hover")
-      }
-      this.lastHoveredUuid = intersects
-    }
-    if (this.board) {
-      let intersects = rayCaster.intersectObjects([this.board])
-      if (intersects.length) {
-        let { x, y } = intersects[0].point
-        let offset = matrixGap * (G.currentRoom.size - 1) / 2
-        if (Math.abs(x) <= offset + matrixGap / 2 && Math.abs(y) <= offset + matrixGap / 2) {
-          let row = Math.max(0, Math.round((offset + x) / matrixGap))
-          let col = Math.max(0, Math.round((offset - y) / matrixGap))
-          if (col !== this.lastX && row !== this.lastY) {
-            this.lastX = col
-            this.lastY = row
-            eventDispatcher.dispatch("indicatorChanged", new IndicatorChangedEvent(col, row))
-          }
+      if (firstUuid) {
+        let handler = G.pointerHandlers.get(firstUuid)
+        handler.callback("move", point)
+        if (firstUuid !== this.lastHoveredUuid) {
+          handler.callback("hover", point)
         }
       }
+      this.lastHoveredUuid = firstUuid
     }
   }
 

@@ -17,13 +17,15 @@ export default class ChessboardInterceptor implements Interceptor {
       let chesses: Chess[] = []
       message.board.matrix.forEach((row, x) => {
         row.forEach((type, y) => {
-          chesses.push(new Chess(x, y, type))
+          if (type !== 0) {
+            chesses.push(new Chess(x, y, type))
+          }
         })
       })
+      G.myChessType = message.board.myChess
       eventDispatcher.dispatch("boardChanged", new BoardChangedEvent(
-        "add",
+        "load",
         chesses,
-        message.board.myChess
       ))
       eventDispatcher.dispatch("playerRotate", new PlayerRotateEvent(
         message.isMeNow

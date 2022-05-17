@@ -23,7 +23,6 @@ export default class Collapse {
   }
 
   public open(): void {
-    console.log(this.inner[0].clientHeight)
     this.datasetCollapsed = false;
     this.el.height(this.inner[0].clientHeight)
   }

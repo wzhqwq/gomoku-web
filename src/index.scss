@@ -1,6 +1,6 @@
 $primary: #1878a8;
 $primary-dark: #05557e;
-$danger: #ff5b57;
+$danger: #c33d3a;
 $card-bg: #222;
 $item-bg: #fff2;
 $card-radius: 14px;
@@ -309,9 +309,9 @@ body {
   padding: 20px;
   border-radius: $card-radius;
   margin-top: 10px;
-  background-color: $card-bg;
   width: calc(100% + 40px);
   &.black {
+    background-color: #333;
     color: white;
     .piece {
       background-color: #000;

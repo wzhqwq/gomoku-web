@@ -15,7 +15,7 @@ export const boardStyles = [
     size: 20,
     color: "#cb002f",
     positionZ: -1500,
-    cameraPosition: new Vector3(50, -300, -1200)
+    cameraPosition: new Vector3(50, -200, -1150)
   }
 ]
 
@@ -26,6 +26,8 @@ export const matrixGap = 20
 export const matrixLineWidth = 2
 export const boardPadding = 40
 export const boardRadius = 15
+export const indicatorOverflow = 20
+export const pieceRadius = 15
 
 export enum ErrorDetail {
   // WebSocket握手阶段发生错误

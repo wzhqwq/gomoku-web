@@ -1,8 +1,8 @@
-import { Object3D } from "three"
+import { Object3D, Vector3 } from "three"
 
 type PointerHandler = {
   target: Object3D
-  callback: (type: "hover" | "click" | "leave") => void
+  callback: (type: "hover" | "click" | "leave" | "move", point?: Vector3) => void
 }
 
 export default class PointerHandlers extends Map<string, PointerHandler> {

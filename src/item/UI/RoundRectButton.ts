@@ -23,6 +23,7 @@ export default class RoundRectButton extends RoundRectText {
     G.pointerHandlers.set(this.uuid, {
       target: this,
       callback: (type: string) => {
+        if (type === "move") return
         if (type === "click") {
           options.onClick?.()
         }
