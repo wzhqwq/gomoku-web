@@ -310,6 +310,7 @@ body {
   border-radius: $card-radius;
   margin-top: 10px;
   width: calc(100% + 40px);
+  transition-duration: .5s;
   &.black {
     background-color: #333;
     color: white;
@@ -347,7 +348,7 @@ body {
     margin: 0 5px;
   }
   &[data-position="half-right"] {
-    transform: translate(60px, 0px);
+    transform: translate(70px, 0px) scale(.8);
   }
 }
 

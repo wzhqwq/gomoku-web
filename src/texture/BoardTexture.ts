@@ -1,5 +1,5 @@
 import { CanvasTexture } from "three"
-import { boardPadding, indicatorOverflow, matrixGap, matrixLineWidth, pieceRadius } from "@util/constants"
+import { boardPadding, indicatorBlocked, indicatorDefault, indicatorOverflow, matrixGap, matrixLineWidth, pieceRadius } from "@util/constants"
 
 const padding = boardPadding * 2, gap = matrixGap * 2, lineWidth = matrixLineWidth, overflow = indicatorOverflow * 2;
 
@@ -17,11 +17,11 @@ export default class BoardTexture extends CanvasTexture {
     this.redraw()
   }
 
-  public drawIndicator(x: number, y: number) {
-    this.redraw(x, y)
+  public drawIndicator(x: number, y: number, blocked?: boolean) {
+    this.redraw(x, y, blocked)
   }
 
-  private redraw(indicatorX?: number, indicatorY?: number) {
+  private redraw(indicatorX?: number, indicatorY?: number, blocked: boolean = false) {
     let ctx = this.ctx
     let size = this.size
 
@@ -48,13 +48,14 @@ export default class BoardTexture extends CanvasTexture {
         ctx.stroke()
       }
     }
-    ctx.beginPath()
-    ctx.fillStyle = "#56ffd688"
-    ctx.ellipse(padding + indicatorX * gap, padding + indicatorY * gap, pieceRadius * 2, pieceRadius * 2, 0, 0, 2 * Math.PI)
-    ctx.stroke()
 
+    ctx.fillStyle = "#0003"
+    ctx.beginPath()
+    ctx.ellipse(padding + indicatorX * gap, padding + indicatorY * gap, pieceRadius * 2, pieceRadius * 2, 0, 0, 2 * Math.PI)
+    ctx.fill()
+
+    ctx.strokeStyle = blocked ? indicatorBlocked : indicatorDefault
     ctx.lineWidth = lineWidth * 2
-    ctx.strokeStyle = "#56ffd6"
     ctx.beginPath()
     ctx.moveTo(padding + indicatorX * gap, padding - overflow)
     ctx.lineTo(padding + indicatorX * gap, end + 10)
@@ -64,12 +65,11 @@ export default class BoardTexture extends CanvasTexture {
     ctx.lineTo(end + overflow, padding + indicatorY * gap)
     ctx.stroke()
 
-
     ctx.textAlign = "center"
     ctx.font = "22px sans-serif"
     for (let i = 0; i < size; i++) {
       if (indicatorX === i) {
-        ctx.fillStyle = "#56ffd6"
+        ctx.fillStyle = blocked ? indicatorBlocked : indicatorDefault
         ctx.beginPath()
         ctx.moveTo(padding + i * gap, end + 5 + lineWidth / 2)
         ctx.lineTo(padding + i * gap, end + 5 + lineWidth / 2)

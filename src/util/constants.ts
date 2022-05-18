@@ -31,6 +31,8 @@ export const pieceRadius = 10
 
 export const blackPieceColor = 0x333333
 export const whitePieceColor = 0xffffff
+export const indicatorDefault = "#80f3c3"
+export const indicatorBlocked = "#ef413d"
 
 export enum ErrorDetail {
   // WebSocket握手阶段发生错误

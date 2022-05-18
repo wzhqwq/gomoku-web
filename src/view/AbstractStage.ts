@@ -11,6 +11,7 @@ export default interface AbstractStage {
   setIndicator(x: number, y: number): void
   addChess(chess: Chess): void
   removeChess(x: number, y: number): void
+  removeAllChess(): void
   highlightChess(x: number, y: number): void
 
   set rooms(rooms: Room[])

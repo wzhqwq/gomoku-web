@@ -4,7 +4,7 @@ import PlaceEvent from "@event/PlaceEvent";
 import BoardTexture from "@texture/BoardTexture";
 import { boardPadding, boardRadius, matrixGap } from "@util/constants";
 import G from "@util/global";
-import { ExtrudeBufferGeometry, ExtrudeGeometry, Group, Material, Mesh, MeshBasicMaterial, MeshMatcapMaterial, MeshPhongMaterial, PlaneBufferGeometry, Shape, Vector3 } from "three";
+import { ExtrudeGeometry, Group, Mesh, MeshBasicMaterial, MeshMatcapMaterial, PlaneBufferGeometry, Shape, Vector3 } from "three";
 
 export default class ChessBoard extends Group {
   private contentTexture: BoardTexture
@@ -27,7 +27,6 @@ export default class ChessBoard extends Group {
     let contentMaterial = new MeshBasicMaterial({
       map: this.contentTexture,
       transparent: true,
-      // specular: 0xffffff,
     })
 
     let shape = new Shape()
@@ -63,8 +62,8 @@ export default class ChessBoard extends Group {
     })
   }
 
-  public setIndicator(x: number, y: number) {
-    this.contentTexture.drawIndicator(x, y)
+  public setIndicator(x: number, y: number, blocked: boolean) {
+    this.contentTexture.drawIndicator(x, y, blocked)
     this.contentTexture.needsUpdate = true
   }
 

@@ -148,11 +148,11 @@ export default class ThreeJsStage implements Stage {
 
   public setIndicator(x: number, y: number) {
     if (this.board) {
-      this.board.setIndicator(x, y)
+      this.board.setIndicator(x, y, this.pieces.has(x * 20 + y))
     }
   }
 
-  addChess(chess: Chess): void {
+  public addChess(chess: Chess): void {
     let piece = new Piece(
       chess.type === 1 ? blackPieceColor : whitePieceColor,
       this.board.calculateChessPosition(chess.x, chess.y)
@@ -161,13 +161,20 @@ export default class ThreeJsStage implements Stage {
     this.scene.add(piece)
     piece.drop()
   }
-  removeChess(x: number, y: number): void {
+  public removeChess(x: number, y: number): void {
     let piece = this.pieces.get(x * 20 + y)
     if (piece) {
       piece.lift()
+      this.pieces.delete(x * 20 + y)
     }
   }
-  highlightChess(x: number, y: number): void {
+  public removeAllChess(): void {
+    this.pieces.forEach(piece => {
+      piece.lift()
+    })
+    this.pieces.clear()
+  }
+  public highlightChess(x: number, y: number): void {
     throw new Error("Method not implemented.")
   }
 

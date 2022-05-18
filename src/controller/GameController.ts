@@ -17,6 +17,7 @@ export default class GameController {
   private stage: AbstractStage = G.stage
   private controlPanel: ControlPanel = G.controlPanel
   private messageArea: MessageArea = G.messageArea
+  private isMyTurn: boolean
 
   constructor() {
     eventDispatcher.listen("indicatorChanged", this.chessBoardIndicatorChanged)
@@ -31,10 +32,6 @@ export default class GameController {
       .then(() => {
         this.controlPanel.players = room.players
         G.WSClient.send(new ChessboardMessage())
-        setTimeout(() => {
-          this.stage.addChess(new Chess(18, 18, 1))
-          this.stage.addChess(new Chess(8, 8, 2))
-        }, 2000)
       })
   }
 
@@ -43,17 +40,30 @@ export default class GameController {
   }
 
   public placeChess = (e: PlaceEvent): void => {
+    if (!this.isMyTurn) return
     G.WSClient.send(new PlaceMessage(
       new Chess(e.detail.x, e.detail.y, G.myChessType)
     ))
   }
 
   public chessBoardChanged = (e: BoardChangedEvent): void => {
-    console.log(e.detail.chesses)
+    switch (e.detail.type) {
+      case "load":
+        this.stage.removeAllChess()
+      case "add":
+        e.detail.chesses.forEach(chess => {
+          this.stage.addChess(chess)
+        })
+        break
+      case "remove":
+        e.detail.chesses.forEach(chess => {
+          this.stage.removeChess(chess.x, chess.y)
+        })
+    }
   }
 
   public playerRotated = (e: PlayerRotateEvent): void => {
-    console.log(e.detail.isMeNow)
+    this.isMyTurn = e.detail.isMeNow
     this.controlPanel.currentChess = e.detail.isMeNow ? G.myChessType : (3 - G.myChessType)
   }
 }
