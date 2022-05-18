@@ -3,9 +3,17 @@ import { boardPadding, indicatorBlocked, indicatorDefault, indicatorOverflow, ma
 
 const padding = boardPadding * 2, gap = matrixGap * 2, lineWidth = matrixLineWidth, overflow = indicatorOverflow * 2;
 
+type RedrawProps = {
+  indicatorX?: number
+  indicatorY?: number
+  blocked?: boolean
+}
+
 export default class BoardTexture extends CanvasTexture {
   private ctx: CanvasRenderingContext2D
   private width: number
+  private request: RedrawProps
+  private heldRedraw: Promise<void>
 
   constructor(private size: number) {
     let canvas = document.createElement("canvas")
@@ -21,7 +29,12 @@ export default class BoardTexture extends CanvasTexture {
     this.redraw(x, y, blocked)
   }
 
+  public clearIndicator() {
+    this.redraw()
+  }
+
   private redraw(indicatorX?: number, indicatorY?: number, blocked: boolean = false) {
+    
     let ctx = this.ctx
     let size = this.size
 
@@ -49,21 +62,23 @@ export default class BoardTexture extends CanvasTexture {
       }
     }
 
-    ctx.fillStyle = "#0003"
-    ctx.beginPath()
-    ctx.ellipse(padding + indicatorX * gap, padding + indicatorY * gap, pieceRadius * 2, pieceRadius * 2, 0, 0, 2 * Math.PI)
-    ctx.fill()
+    if (indicatorX !== null && indicatorY !== null) {
+      ctx.fillStyle = "#0003"
+      ctx.beginPath()
+      ctx.ellipse(padding + indicatorX * gap, padding + indicatorY * gap, pieceRadius * 2, pieceRadius * 2, 0, 0, 2 * Math.PI)
+      ctx.fill()
 
-    ctx.strokeStyle = blocked ? indicatorBlocked : indicatorDefault
-    ctx.lineWidth = lineWidth * 2
-    ctx.beginPath()
-    ctx.moveTo(padding + indicatorX * gap, padding - overflow)
-    ctx.lineTo(padding + indicatorX * gap, end + 10)
-    ctx.stroke()
-    ctx.beginPath()
-    ctx.moveTo(padding - overflow, padding + indicatorY * gap)
-    ctx.lineTo(end + overflow, padding + indicatorY * gap)
-    ctx.stroke()
+      ctx.strokeStyle = blocked ? indicatorBlocked : indicatorDefault
+      ctx.lineWidth = lineWidth * 2
+      ctx.beginPath()
+      ctx.moveTo(padding + indicatorX * gap, padding - overflow)
+      ctx.lineTo(padding + indicatorX * gap, end + 10)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.moveTo(padding - overflow, padding + indicatorY * gap)
+      ctx.lineTo(end + overflow, padding + indicatorY * gap)
+      ctx.stroke()
+    }
 
     ctx.textAlign = "center"
     ctx.font = "22px sans-serif"

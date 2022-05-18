@@ -1,6 +1,8 @@
 import * as $ from "jquery"
 import Player from "@model/base/Player"
 import Collapse from "./Collapse"
+import eventDispatcher from "@event/eventDispatcher"
+import ControlEvent from "@event/ControlEvent"
 
 export default class ControlPanel {
   // panels
@@ -40,6 +42,8 @@ export default class ControlPanel {
 
     this.confirmButton.on("click", () => this.confirmResolver?.(true))
     this.cancelButton.on("click", () => this.confirmResolver?.(false))
+    this.abortButton.on("click", () => eventDispatcher.dispatch("control", new ControlEvent("leave")))
+    this.retractButton.on("click", () => eventDispatcher.dispatch("control", new ControlEvent("retract")))
   }
 
   public openPanel(): Promise<void> {
@@ -108,14 +112,6 @@ export default class ControlPanel {
     this.playerPanels.forEach((panel, index) => {
       panel[0].dataset.position = index + 1 === chess ? "origin" : "half-right"
     })
-  }
-
-  public bindAbort(handler: () => void): void {
-    this.abortButton.on("click", handler)
-  }
-
-  public bindRetract(handler: () => void): void {
-    this.retractButton.on("click", handler)
   }
 
   public set retracting(value: boolean) {

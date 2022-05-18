@@ -36,11 +36,10 @@ export default class GameController {
   }
 
   public chessBoardIndicatorChanged = (e: IndicatorChangedEvent): void => {
-    this.stage.setIndicator(e.detail.x, e.detail.y)
+    this.stage.setIndicator(e.detail.x, e.detail.y, !this.isMyTurn)
   }
 
   public placeChess = (e: PlaceEvent): void => {
-    if (!this.isMyTurn) return
     G.WSClient.send(new PlaceMessage(
       new Chess(e.detail.x, e.detail.y, G.myChessType)
     ))
@@ -65,5 +64,6 @@ export default class GameController {
   public playerRotated = (e: PlayerRotateEvent): void => {
     this.isMyTurn = e.detail.isMeNow
     this.controlPanel.currentChess = e.detail.isMeNow ? G.myChessType : (3 - G.myChessType)
+    this.stage.boardDisabled = !e.detail.isMeNow
   }
 }

@@ -1,3 +1,5 @@
+import eventDispatcher from '@event/eventDispatcher'
+import SendMessageEvent from '@event/SendMessageEvent'
 import * as $ from 'jquery'
 
 export default class MessageArea {
@@ -9,5 +11,15 @@ export default class MessageArea {
     this.sendButton = $('#btn-send')
     this.messageTextArea = $('#message-input')
     this.messageBox = $('#message-box')
+
+    this.sendButton.on("click", () => eventDispatcher.dispatch("sendMessage", new SendMessageEvent(
+      this.messageTextArea.val() as string
+    )))
+  }
+
+  public appendMessage(content: string, isMine: boolean) {
+    const message = $(`<div class="message ${isMine ? 'mine' : ''}">${content}</div>`)
+    this.messageBox.append(message)
+    this.messageBox.scrollTop(this.messageBox.prop("scrollHeight"))
   }
 }

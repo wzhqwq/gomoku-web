@@ -152,6 +152,12 @@ export default class ThreeJsStage implements Stage {
     }
   }
 
+  public set boardDisabled(disabled: boolean) {
+    if (this.board) {
+      this.board.disabled = disabled
+    }
+  }
+
   public addChess(chess: Chess): void {
     let piece = new Piece(
       chess.type === 1 ? blackPieceColor : whitePieceColor,

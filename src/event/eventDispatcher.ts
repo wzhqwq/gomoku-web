@@ -1,5 +1,6 @@
 import BaseEvent from "./BaseEvent"
 import BoardChangedEvent from "./BoardChangedEvent"
+import ControlEvent from "./ControlEvent"
 import DoCreateRoomEvent from "./DoCreateRoomEvent"
 import { CreateRoomEvent, FetchRoomEvent } from "./emptyEvents"
 import IndicatorChangedEvent from "./IndicatorChangedEvent"
@@ -7,6 +8,7 @@ import PlaceEvent from "./PlaceEvent"
 import PlayerRotateEvent from "./PlayerRotateEvent"
 import RoomUpdatedEvent from "./RoomUpdatedEvent"
 import SelectRoomEvent from "./SelectRoomEvent"
+import SendMessageEvent from "./SendMessageEvent"
 
 export interface EventMap {
   selectRoom: SelectRoomEvent
@@ -18,6 +20,8 @@ export interface EventMap {
   boardChanged: BoardChangedEvent
   playerRotate: PlayerRotateEvent
   place: PlaceEvent
+  control: ControlEvent
+  sendMessage: SendMessageEvent
 }
 
 export type EventNameType = keyof EventMap

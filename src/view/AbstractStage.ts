@@ -8,7 +8,7 @@ export default interface AbstractStage {
 
   enterGame(): void
   leaveGame(): void
-  setIndicator(x: number, y: number): void
+  setIndicator(x: number, y: number, disabled: boolean): void
   addChess(chess: Chess): void
   removeChess(x: number, y: number): void
   removeAllChess(): void
@@ -16,4 +16,6 @@ export default interface AbstractStage {
 
   set rooms(rooms: Room[])
   set roomListLoading(loading: boolean)
+  
+  set boardDisabled(disabled: boolean)
 }

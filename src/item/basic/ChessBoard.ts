@@ -11,6 +11,7 @@ export default class ChessBoard extends Group {
 
   private lastCol: number = -1
   private lastRow: number = -1
+  private _disabled: boolean = false
   
   public width: number
 
@@ -63,11 +64,25 @@ export default class ChessBoard extends Group {
   }
 
   public setIndicator(x: number, y: number, blocked: boolean) {
-    this.contentTexture.drawIndicator(x, y, blocked)
-    this.contentTexture.needsUpdate = true
+    if (!this._disabled) {
+      this.contentTexture.drawIndicator(x, y, blocked)
+      this.contentTexture.needsUpdate = true
+    }
+  }
+
+  public set disabled(disabled: boolean) {
+    this._disabled = disabled
+    if (disabled) {
+      this.contentTexture.clearIndicator()
+    }
+  }
+
+  public get disabled(): boolean {
+    return this._disabled
   }
 
   public handlePointer = (type: string, point: Vector3): void => {
+    if (this._disabled) return
     if (type === "move") {
       let { x, y } = point
       let offset = matrixGap * (G.currentRoom.size - 1) / 2

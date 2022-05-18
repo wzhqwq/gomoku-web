@@ -103,8 +103,10 @@ body {
   color: #fff;
   cursor: pointer;
   box-shadow: -2px 2px 4px #0003;
+  transition: filter 0.3s ease-out;
   &:disabled {
     cursor: not-allowed;
+    filter: grayscale(1) opacity(0.5);
   }
   &.btn-primary {
     background-color: $primary;
