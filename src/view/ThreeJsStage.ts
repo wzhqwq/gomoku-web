@@ -7,10 +7,11 @@ import G from "@util/global"
 import { CreateRoomEvent, FetchRoomEvent } from "@event/emptyEvents"
 import Stage from "./AbstractStage"
 import ChessBoard from "@item/basic/ChessBoard"
-import { boardStyles, matrixGap } from "@util/constants"
+import { blackPieceColor, boardStyles, matrixGap, whitePieceColor } from "@util/constants"
 import SlideAnimationClip, { SlideTrack } from "@animation/SlideAnimationClip"
 import IndicatorChangedEvent from "@event/IndicatorChangedEvent"
 import Piece from "@item/basic/Piece"
+import Chess from "@model/base/Chess"
 
 export default class ThreeJsStage implements Stage {
   // DOM
@@ -38,6 +39,8 @@ export default class ThreeJsStage implements Stage {
   private cameraSlideMixer: AnimationMixer
   private cameraMoving: boolean = false
   private lookAt: Vector3
+
+  private pieces: Map<number, Piece> = new Map()
 
   constructor() {
     this.roomTitle = $("#room-title")
@@ -147,6 +150,25 @@ export default class ThreeJsStage implements Stage {
     if (this.board) {
       this.board.setIndicator(x, y)
     }
+  }
+
+  addChess(chess: Chess): void {
+    let piece = new Piece(
+      chess.type === 1 ? blackPieceColor : whitePieceColor,
+      this.board.calculateChessPosition(chess.x, chess.y)
+    )
+    this.pieces.set(chess.x * 20 + chess.y, piece)
+    this.scene.add(piece)
+    piece.drop()
+  }
+  removeChess(x: number, y: number): void {
+    let piece = this.pieces.get(x * 20 + y)
+    if (piece) {
+      piece.lift()
+    }
+  }
+  highlightChess(x: number, y: number): void {
+    throw new Error("Method not implemented.")
   }
 
   public leaveGame(): void {

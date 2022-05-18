@@ -27,7 +27,10 @@ export const matrixLineWidth = 2
 export const boardPadding = 40
 export const boardRadius = 15
 export const indicatorOverflow = 20
-export const pieceRadius = 15
+export const pieceRadius = 10
+
+export const blackPieceColor = 0x333333
+export const whitePieceColor = 0xffffff
 
 export enum ErrorDetail {
   // WebSocket握手阶段发生错误

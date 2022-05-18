@@ -1,4 +1,5 @@
 import { AnimationClip, InterpolateSmooth, NumberKeyframeTrack, Vector3 } from "three"
+import { BlinkTrack } from "./BlinkAnimationClip"
 import { SlideTrack } from "./SlideAnimationClip"
 
 export default class DropAnimationClip extends AnimationClip {
@@ -13,6 +14,11 @@ export default class DropAnimationClip extends AnimationClip {
       new RotateTrack(
         duration,
         nodeFinder,
+      ),
+      new BlinkTrack(
+        duration / 2,
+        nodeFinder,
+        false,
       ),
     ])
   }

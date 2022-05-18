@@ -1,5 +1,5 @@
 import { CanvasTexture } from "three"
-import { boardPadding, indicatorOverflow, matrixGap, matrixLineWidth } from "@util/constants"
+import { boardPadding, indicatorOverflow, matrixGap, matrixLineWidth, pieceRadius } from "@util/constants"
 
 const padding = boardPadding * 2, gap = matrixGap * 2, lineWidth = matrixLineWidth, overflow = indicatorOverflow * 2;
 
@@ -48,6 +48,11 @@ export default class BoardTexture extends CanvasTexture {
         ctx.stroke()
       }
     }
+    ctx.beginPath()
+    ctx.fillStyle = "#56ffd688"
+    ctx.ellipse(padding + indicatorX * gap, padding + indicatorY * gap, pieceRadius * 2, pieceRadius * 2, 0, 0, 2 * Math.PI)
+    ctx.stroke()
+
     ctx.lineWidth = lineWidth * 2
     ctx.strokeStyle = "#56ffd6"
     ctx.beginPath()
@@ -58,6 +63,7 @@ export default class BoardTexture extends CanvasTexture {
     ctx.moveTo(padding - overflow, padding + indicatorY * gap)
     ctx.lineTo(end + overflow, padding + indicatorY * gap)
     ctx.stroke()
+
 
     ctx.textAlign = "center"
     ctx.font = "22px sans-serif"

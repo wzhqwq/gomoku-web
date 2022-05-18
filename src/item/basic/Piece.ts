@@ -7,6 +7,8 @@ export default class Piece extends Mesh {
   private animationMixer: AnimationMixer
   private dropAnimationAction: AnimationAction
 
+  private status: "dropping" | "lifting"
+
   constructor(color: number, private endPoint: Vector3) {
     super()
     let material = new MeshMatcapMaterial({
@@ -31,14 +33,30 @@ export default class Piece extends Mesh {
       new DropAnimationClip(0.5, endPoint)
     )
     this.dropAnimationAction.setLoop(LoopOnce, 1)
+    this.dropAnimationAction.clampWhenFinished = true
   }
 
   public drop() {
+    this.status = "dropping"
     this.dropAnimationAction.reset()
     this.dropAnimationAction.play()
   }
 
+  public lift() {
+    this.status = "lifting"
+    this.dropAnimationAction.reset()
+    this.dropAnimationAction.time = 0.5
+    this.dropAnimationAction.setEffectiveTimeScale(-1)
+    this.dropAnimationAction.play()
+  }
+
   private handleAnimationFinish() {
-    this.position.copy(this.endPoint)
+    switch (this.status) {
+      case "dropping":
+        this.position.copy(this.endPoint)
+        break
+      case "lifting":
+        break
+    }
   }
 }

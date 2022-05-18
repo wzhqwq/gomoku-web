@@ -31,6 +31,10 @@ export default class GameController {
       .then(() => {
         this.controlPanel.players = room.players
         G.WSClient.send(new ChessboardMessage())
+        setTimeout(() => {
+          this.stage.addChess(new Chess(18, 18, 1))
+          this.stage.addChess(new Chess(8, 8, 2))
+        }, 2000)
       })
   }
 

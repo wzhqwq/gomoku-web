@@ -11,11 +11,14 @@ export default class ChessBoard extends Group {
 
   private lastCol: number = -1
   private lastRow: number = -1
+  
+  public width: number
 
   constructor(private size: number) {
     super()
     
-    let width = (size - 1) * matrixGap + 2 * boardPadding;
+    let width = (size - 1) * matrixGap + 2 * boardPadding
+    this.width = width
     let baseMaterial = new MeshMatcapMaterial({
       matcap: G.matcaps.general,
       color: 0xffdb99,
@@ -49,7 +52,7 @@ export default class ChessBoard extends Group {
     let base = new Mesh(boxGeometry, baseMaterial)
     let content = new Mesh(planeGeometry, contentMaterial)
 
-    base.position.set(-width / 2, -width / 2, -20.01)
+    base.position.set(-width / 2, -width / 2, -15)
     content.position.set(0, 0, 0)
     this.add(base)
     this.add(content)
@@ -81,10 +84,15 @@ export default class ChessBoard extends Group {
     }
     if (type === "click") {
       if (this.lastCol !== -1 && this.lastRow !== -1) {
-        console.log(this.lastCol, this.lastRow)
         eventDispatcher.dispatch("place", new PlaceEvent(this.lastCol, this.lastRow))
         this.lastCol = this.lastRow = -1
       }
     }
+  }
+
+  public calculateChessPosition(col: number, row: number): Vector3 {
+    let offset = -matrixGap * (G.currentRoom.size - 1) / 2
+    let a = new Vector3(offset + col * matrixGap, -(offset + row * matrixGap), this.position.z)
+    return a
   }
 }
