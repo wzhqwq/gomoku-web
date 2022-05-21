@@ -2,6 +2,7 @@ import Interceptor from "@interceptor/Interceptor";
 import Room from "@model/base/Room";
 import BaseMessage from "@model/ws/BaseMessage";
 import BaseRequest from "@model/ws/BaseRequest";
+import { MessageTypes } from "@model/ws/collection";
 import ErrorMessage from "@model/ws/ErrorMessage";
 import RawMessage from "@model/ws/RawMessage"
 import { stringify } from "qs";
@@ -38,11 +39,12 @@ export default class WebSocketClient {
       const message = new RawMessage(JSON.parse(event.data))
       const intercepted = interceptors.reduce((message, interceptor) => {
         if (!message) return
-        if (!interceptor.preferredTypes || interceptor.preferredTypes.includes(message.type)) {
+        if (!interceptor.preferredTypes || interceptor.preferredTypes.includes(message.type as MessageTypes)) {
           return interceptor.intercept(message)
         }
         return message
       }, message)
+      if (!intercepted) return
       this.sendResolver?.(intercepted)
       this.sendResolver = null
     }

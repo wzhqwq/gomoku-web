@@ -154,6 +154,18 @@ export default abstract class BaseComponent extends Mesh
     })
   }
 
+  public dispose() {
+    G.mixers.delete(this.uuid)
+    G.pointerHandlers.delete(this.uuid)
+    this.animationMixer.removeEventListener("finished", this.hideAnimationFinishHandler)
+    if (this.material instanceof Array) {
+      this.material.forEach(m => m.dispose())
+    }
+    else {
+      this.material.dispose()
+    }
+  }
+
   private doSlide() {
     this.latestSlideEnd = null
     this.slideAnimationClip = new SlideAnimationClip(0.5, this.position, this.slideEnd)

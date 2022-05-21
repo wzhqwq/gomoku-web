@@ -1,4 +1,4 @@
-import { CanvasTexture } from "three"
+import { CanvasTexture, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter } from "three"
 import { boardPadding, indicatorBlocked, indicatorDefault, indicatorOverflow, matrixGap, matrixLineWidth, pieceRadius } from "@util/constants"
 
 const padding = boardPadding * 2, gap = matrixGap * 2, lineWidth = matrixLineWidth, overflow = indicatorOverflow * 2;
@@ -19,6 +19,7 @@ export default class BoardTexture extends CanvasTexture {
     this.width = canvas.width
     this.generateGridBuffer()
     this.generateColumnBuffer()
+    this.minFilter = LinearMipmapNearestFilter
     this.redraw()
   }
 
@@ -108,7 +109,6 @@ export default class BoardTexture extends CanvasTexture {
   }
 
   private redraw(indicatorX?: number, indicatorY?: number, blocked: boolean = false) {
-    console.log("redraw", indicatorX, Date.now())
     let ctx = this.ctx
     let size = this.size
     let end = padding + (size - 1) * gap

@@ -6,6 +6,9 @@ import { CreateRoomEvent, FetchRoomEvent } from "./emptyEvents"
 import IndicatorChangedEvent from "./IndicatorChangedEvent"
 import PlaceEvent from "./PlaceEvent"
 import PlayerRotateEvent from "./PlayerRotateEvent"
+import PutMessageEvent from "./PutMessageEvent"
+import RequestEvent from "./RequestEvent"
+import RetractionEvent from "./RetractionEvent"
 import RoomUpdatedEvent from "./RoomUpdatedEvent"
 import SelectRoomEvent from "./SelectRoomEvent"
 import SendMessageEvent from "./SendMessageEvent"
@@ -22,6 +25,9 @@ export interface EventMap {
   place: PlaceEvent
   control: ControlEvent
   sendMessage: SendMessageEvent
+  putMessage: PutMessageEvent
+  request: RequestEvent
+  retraction: RetractionEvent
 }
 
 export type EventNameType = keyof EventMap

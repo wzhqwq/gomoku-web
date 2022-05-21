@@ -14,12 +14,6 @@ export type RoundRectTextOptions = {
 }
 
 export default class RoundRectText extends BaseComponent {
-  public width: number
-  public height: number
-
-  public readonly mesh: Mesh
-  public readonly animationMixer: AnimationMixer
-
   private options: RoundRectTextOptions
   private canvas: HTMLCanvasElement
   private textPos: { x: number, y: number }

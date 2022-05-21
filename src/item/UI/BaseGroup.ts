@@ -101,6 +101,16 @@ export default class BaseGroup extends Group
     })
   }
 
+  public dispose() {
+    G.mixers.delete(this.uuid)
+    G.pointerHandlers.delete(this.uuid)
+    this.animationMixer.removeEventListener("finished", this.slideAnimationFinishHandler)
+    this.children.forEach((child: Object3D) => {
+      if (!(child instanceof BaseComponent) && !(child instanceof BaseGroup)) return
+      child.dispose()
+    })
+  }
+
   private doSlide() {
     this.latestSlideEnd = null
     this.slideAnimationClip = new SlideAnimationClip(0.5, this.position, this.slideEnd)

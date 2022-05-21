@@ -1,5 +1,6 @@
 import BaseMessage from "@model/ws/BaseMessage"
 import ChessboardMessage from "@model/ws/ChessboardMessage"
+import { MessageTypes } from "@model/ws/collection"
 import ErrorMessage from "@model/ws/ErrorMessage"
 import GameOverMessage from "@model/ws/GameOverMessage"
 import InstantMessage from "@model/ws/InstantMessage"
@@ -11,7 +12,7 @@ import RoomMessage from "@model/ws/RoomMessage"
 import Interceptor from "./Interceptor"
 
 export default class RawInterceptor implements Interceptor {
-  preferredTypes: string[] = null
+  preferredTypes: MessageTypes[] = null
 
   intercept(message: BaseMessage): BaseMessage {
     if (!(message instanceof RawMessage)) return null

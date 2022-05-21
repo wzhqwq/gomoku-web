@@ -1,12 +1,12 @@
 import eventDispatcher from "@event/eventDispatcher"
 import RoomUpdatedEvent from "@event/RoomUpdatedEvent"
 import BaseMessage from "@model/ws/BaseMessage"
+import { MessageTypes } from "@model/ws/collection"
 import RoomMessage from "@model/ws/RoomMessage"
-import G from "@util/global"
 import Interceptor from "./Interceptor"
 
 export default class RoomInterceptor implements Interceptor {
-  preferredTypes: string[] = ["gameInfo"]
+  preferredTypes: MessageTypes[] = ["gameInfo"]
 
   intercept(message: BaseMessage): void {
     if (!(message instanceof RoomMessage)) return

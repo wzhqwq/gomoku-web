@@ -39,6 +39,13 @@ export default class RoomController {
     this.stage.enterRoomPage()
   }
 
+  public backRoom() {
+    this.startRoom()
+    setTimeout(() => {
+      this.stage.unfocusRoom()
+    }, 200);
+  }
+
   public async fetchRooms(updateStage: boolean = true): Promise<Room[]> {
     this.stage.roomListLoading = true
     const data = await $.get({

@@ -16,7 +16,7 @@ export default class DropAnimationClip extends AnimationClip {
         nodeFinder,
       ),
       new BlinkTrack(
-        duration / 2,
+        duration,
         nodeFinder,
         false,
       ),

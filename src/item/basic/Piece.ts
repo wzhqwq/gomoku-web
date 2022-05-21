@@ -8,6 +8,7 @@ export default class Piece extends Mesh {
   private dropAnimationAction: AnimationAction
 
   private status: "dropping" | "lifting"
+  private animationEndCallback: () => void
 
   constructor(color: number, private endPoint: Vector3) {
     super()
@@ -42,21 +43,19 @@ export default class Piece extends Mesh {
     this.dropAnimationAction.play()
   }
 
-  public lift() {
+  public lift(): Promise<void> {
     this.status = "lifting"
     this.dropAnimationAction.reset()
     this.dropAnimationAction.time = 0.5
     this.dropAnimationAction.setEffectiveTimeScale(-1)
     this.dropAnimationAction.play()
+    return new Promise(res => {
+      this.animationEndCallback = res
+    })
   }
 
-  private handleAnimationFinish() {
-    switch (this.status) {
-      case "dropping":
-        this.position.copy(this.endPoint)
-        break
-      case "lifting":
-        break
-    }
+  private handleAnimationFinish = () => {
+    this.animationEndCallback?.()
+    this.animationEndCallback = null
   }
 }

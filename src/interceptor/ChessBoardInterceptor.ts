@@ -4,13 +4,14 @@ import PlayerRotateEvent from "@event/PlayerRotateEvent"
 import Chess from "@model/base/Chess"
 import BaseMessage from "@model/ws/BaseMessage"
 import ChessboardMessage from "@model/ws/ChessboardMessage"
+import { MessageTypes } from "@model/ws/collection"
 import PlaceMessage from "@model/ws/PlaceMessage"
 import RetractionResultMessage from "@model/ws/RetractionResultMessage"
 import G from "@util/global"
 import Interceptor from "./Interceptor"
 
 export default class ChessboardInterceptor implements Interceptor {
-  preferredTypes: string[] = ["chessboard", "place", "retractionResult"]
+  preferredTypes: MessageTypes[] = ["chessboard", "place", "retractionResult"]
 
   intercept(message: BaseMessage): BaseMessage | void {
     if (message instanceof ChessboardMessage) {
@@ -41,6 +42,8 @@ export default class ChessboardInterceptor implements Interceptor {
       ))
     }
     if (message instanceof RetractionResultMessage) {
+      if (!message.accepted) return message
+
       eventDispatcher.dispatch("boardChanged", new BoardChangedEvent(
         "remove",
         message.retraction.retractedLog.map(log => log.chess)
@@ -48,6 +51,7 @@ export default class ChessboardInterceptor implements Interceptor {
       eventDispatcher.dispatch("playerRotate", new PlayerRotateEvent(
         message.retraction.requestedBy === G.me.name
       ))
+      return message
     }
     return
   }

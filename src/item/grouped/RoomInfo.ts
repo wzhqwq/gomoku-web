@@ -84,6 +84,7 @@ export default class RoomInfo extends BaseGroup {
   private drawEnterGame(x: number, y: number, room: Room) {
     if (this.lastBottomState === 0) return
     this.lastBottomState = 0
+    this.removeCurrent()
 
     let hasMe = room.players.some(p => p.name === G.me.name && !p.online)
 
@@ -120,12 +121,7 @@ export default class RoomInfo extends BaseGroup {
   private drawWaitForOpponent(x: number, y: number) {
     if (this.lastBottomState === 1) return
     this.lastBottomState = 1
-    
-    let isChange = this.bottomArea !== null
-    if (isChange) {
-      this.bottomArea.blinking = false
-      this.bottomArea.setHiddenImmediately(true)
-    }
+    this.removeCurrent()
 
     this.bottomArea = new RoundRectText({
       content: "等待玩家加入...",
@@ -136,9 +132,6 @@ export default class RoomInfo extends BaseGroup {
     })
     
     this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
-    if (isChange) {
-      this.bottomArea.setHiddenImmediately(false)
-    }
     this.bottomArea.blinking = true
 
     this.add(this.bottomArea)
@@ -147,12 +140,7 @@ export default class RoomInfo extends BaseGroup {
   private intoPlayingState(x: number, y: number) {
     if (this.lastBottomState === 2) return
     this.lastBottomState = 2
-    
-    let isChange = this.bottomArea !== null
-    if (isChange) {
-      this.bottomArea.blinking = false
-      this.bottomArea.setHiddenImmediately(true)
-    }
+    this.removeCurrent()
 
     this.bottomArea = new RoundRectText({
       content: "游戏中",
@@ -163,9 +151,6 @@ export default class RoomInfo extends BaseGroup {
     })
 
     this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
-    if (isChange) {
-      this.bottomArea.setHiddenImmediately(false)
-    }
 
     this.add(this.bottomArea)
   }
@@ -173,12 +158,7 @@ export default class RoomInfo extends BaseGroup {
   private intoEndedState(x: number, y: number) {
     if (this.lastBottomState === 3) return
     this.lastBottomState = 3
-    
-    let isChange = this.bottomArea !== null
-    if (isChange) {
-      this.bottomArea.blinking = false
-      this.bottomArea.setHiddenImmediately(true)
-    }
+    this.removeCurrent()
 
     this.bottomArea = new RoundRectText({
       content: "游戏结束",
@@ -189,11 +169,17 @@ export default class RoomInfo extends BaseGroup {
     })
 
     this.bottomArea.setPositionByAnchor("bottomLeft", x, y - this.bottomArea.height, 0)
-    if (isChange) {
-      this.bottomArea.setHiddenImmediately(false)
-    }
 
     this.add(this.bottomArea)
+  }
+
+  private removeCurrent() {
+    if (this.bottomArea !== null) {
+      this.bottomArea.blinking = false
+      this.bottomArea.setHiddenImmediately(true)
+      this.bottomArea.dispose()
+      this.remove(this.bottomArea)
+    }
   }
 }
 

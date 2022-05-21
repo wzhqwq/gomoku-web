@@ -4,13 +4,13 @@ export const boardStyles = [
   {
     size: 10,
     color: "#0077cb",
-    positionZ: -300,
-    cameraPosition: new Vector3(0, -100, -500)
+    positionZ: -600,
+    cameraPosition: new Vector3(50, -100, -300)
   }, {
     size: 15,
     color: "#af7900",
-    positionZ: -500,
-    cameraPosition: new Vector3(0, -100, -500)
+    positionZ: -1000,
+    cameraPosition: new Vector3(50, -140, -650)
   }, {
     size: 20,
     color: "#cb002f",

@@ -60,6 +60,8 @@ body {
     transform: translate(0px, 0px);
     filter: opacity(1);
   }
+
+  will-change: transform, filter;
 }
 .collapse {
   position: relative;
@@ -74,6 +76,7 @@ body {
   .collapse-inner {
     position: absolute;
   }
+  will-change: height, transform, filter;
 }
 
 .control-panel {
@@ -117,6 +120,7 @@ body {
   &.btn-dark {
     background-color: $item-bg;
   }
+  will-change: filter;
 }
 
 .btns {
@@ -232,6 +236,7 @@ body {
         color: black;
       }
     }
+    will-change: background-color;
   }
   .radio-wrapper {
     display: flex;
@@ -310,7 +315,7 @@ body {
   align-items: center;
   padding: 20px;
   border-radius: $card-radius;
-  margin-top: 10px;
+  margin: 10px 0;
   width: calc(100% + 40px);
   transition-duration: .5s;
   &.black {
@@ -357,18 +362,19 @@ body {
 .card {
   border-radius: $card-radius;
   background-color: $card-bg;
+  color: #fff;
   .card-body {
-    padding: 10px;
+    padding: 15px;
   }
   .btns {
+    padding: 5px;
     > .btn {
       flex-grow: 1;
     }
   }
 }
 
-#normal-collapse {
-  margin: 10px 0;
+.collapse {
   .collapse-inner {
     width: 100%;
   }
@@ -378,6 +384,7 @@ body {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  margin-top: 10px;
   > .card-body {
     flex-grow: 1;
   }
@@ -406,5 +413,48 @@ body {
       height: 100%;
       min-width: 60px;
     }
+  }
+}
+
+#message-box {
+  display: flex;
+  flex-direction: column;
+  .message {
+    animation: show-up 0.3s ease-out;
+    margin-bottom: 10px;
+    &.mine,
+    &.opponent {
+      border-radius: $item-radius;
+      padding: 6px 10px;
+      box-shadow: -2px 2px 4px #0003;
+    }
+    &.mine {
+      align-self: flex-end;
+      background-color: $primary;
+    }
+    &.opponent {
+      align-self: flex-start;
+      background-color: #444;
+    }
+    &.system {
+      align-self: center;
+      border: 1px solid #888;
+      padding: 0 10px;
+      line-height: 26px;
+      height: 26px;
+      border-radius: 13px;
+      font-size: 14px;
+    }
+  }
+}
+
+@keyframes show-up {
+  0% {
+    filter: opacity(0);
+    transform: translateY(10px);
+  }
+  100% {
+    filter: opacity(1);
+    transform: translateY(0);
   }
 }

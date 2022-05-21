@@ -1,6 +1,4 @@
-import RealObject from "./RealObject";
-
-export default class Chess implements RealObject {
+export default class Chess {
   constructor(
     public x: number,
     public y: number,

@@ -21,6 +21,8 @@ import RoomInterceptor from "@interceptor/RoomInterceptor"
 import ChessBoard from "@item/basic/ChessBoard"
 import ControlPanel from "@view/ControlPanel"
 import MessageArea from "@view/MessageArea"
+import MessageBoxInterceptor from "@interceptor/MessageBoxInterceptor"
+import RetractionInterceptor from "@interceptor/RetractionInterceptor"
 
 type BoardFaceInfo = {
   size: number
@@ -145,6 +147,8 @@ class Global {
         new ErrorInterceptor(),
         new RoomInterceptor(),
         new ChessboardInterceptor(),
+        new MessageBoxInterceptor(),
+        new RetractionInterceptor(),
       ]
     }
     return this._interceptors

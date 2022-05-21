@@ -39,6 +39,7 @@ export default class ThreeJsStage implements Stage {
   private cameraSlideMixer: AnimationMixer
   private cameraMoving: boolean = false
   private lookAt: Vector3
+  private cameraEndCallback: () => void
 
   private pieces: Map<number, Piece> = new Map()
 
@@ -117,6 +118,10 @@ export default class ThreeJsStage implements Stage {
     await this.roomList.focus(room.roomName)
   }
 
+  public unfocusRoom(): void {
+    this.roomList.unfocus()
+  }
+
   public set rooms(rooms: Room[]) {
     this.roomList.rooms = rooms
   }
@@ -142,6 +147,8 @@ export default class ThreeJsStage implements Stage {
     this.lookAt = new Vector3(50, 0, config.positionZ - 100)
     setTimeout(() => {
       this.cameraMoving = true
+      cameraAction.reset()
+      cameraAction.setEffectiveTimeScale(1)
       cameraAction.play()
     }, 200);
   }
@@ -170,13 +177,15 @@ export default class ThreeJsStage implements Stage {
   public removeChess(x: number, y: number): void {
     let piece = this.pieces.get(x * 20 + y)
     if (piece) {
-      piece.lift()
+      piece.lift().then(() => {
+        this.scene.remove(piece)
+      })
       this.pieces.delete(x * 20 + y)
     }
   }
-  public removeAllChess(): void {
+  public removeAllChesses(): void {
     this.pieces.forEach(piece => {
-      piece.lift()
+      this.scene.remove(piece)
     })
     this.pieces.clear()
   }
@@ -184,8 +193,26 @@ export default class ThreeJsStage implements Stage {
     throw new Error("Method not implemented.")
   }
 
-  public leaveGame(): void {
+  public async leaveGame() {
+    let size = G.currentRoom.size, index = boardStyles.map(style => style.size).indexOf(size)
+    let cameraAction = this.cameraSlideActions[index]
+    this.cameraMoving = true
+    cameraAction.reset()
+    cameraAction.time = 0.8
+    cameraAction.setEffectiveTimeScale(-1)
+    this.cameraMoving = true
+    cameraAction.play()
+    await new Promise<void>(res => {
+      this.cameraEndCallback = res
+    })
+    cameraAction.enabled = false
     this.roomList.hidden = false
+    setTimeout(() => {
+      this.scene.remove(this.board)
+      this.board = null
+      this.camera.lookAt(0, 0, 0)
+      this.removeAllChesses()
+    }, 200);
   }
 
   // 私有方法
@@ -286,5 +313,6 @@ export default class ThreeJsStage implements Stage {
 
   private handleCameraSlideEnd = (): void => {
     this.cameraMoving = false
+    this.cameraEndCallback?.()
   }
 }
