@@ -380,18 +380,26 @@ body {
   }
 }
 
+#normal-collapse {
+  flex-shrink: 0;
+}
+
 #message-box-wrapper {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   margin-top: 10px;
+  min-height: 0;
   > .card-body {
     flex-grow: 1;
+    min-height: 0;
+    overflow: auto;
   }
   > .sender {
     padding: 8px;
     display: flex;
     height: 80px;
+    flex-shrink: 0;
     textarea {
       border: none;
       border-radius: $item-radius;
