@@ -6,6 +6,7 @@ import GameOverMessage from "@model/ws/GameOverMessage"
 import InstantMessage from "@model/ws/InstantMessage"
 import PlaceMessage from "@model/ws/PlaceMessage"
 import RawMessage from "@model/ws/RawMessage"
+import RetractionPreviewMessage from "@model/ws/RetractionPreview"
 import RetractionRequestMessage from "@model/ws/RetractionRequestMessage"
 import RetractionResultMessage from "@model/ws/RetractionResultMessage"
 import RoomMessage from "@model/ws/RoomMessage"
@@ -29,6 +30,8 @@ export default class RawInterceptor implements Interceptor {
         return PlaceMessage.fromRawObject(message.object)
       case "chessboard":
         return ChessboardMessage.fromRawObject(message.object)
+      case "retractionPreview":
+        return RetractionPreviewMessage.fromRawObject(message.object)
       case "retractionRequest":
         return RetractionRequestMessage.fromRawObject(message.object)
       case "retractionResult":

@@ -5,7 +5,7 @@ export const boardStyles = [
     size: 10,
     color: "#0077cb",
     positionZ: -600,
-    cameraPosition: new Vector3(50, -100, -300)
+    cameraPosition: new Vector3(50, -80, -360)
   }, {
     size: 15,
     color: "#af7900",
@@ -15,7 +15,7 @@ export const boardStyles = [
     size: 20,
     color: "#cb002f",
     positionZ: -1500,
-    cameraPosition: new Vector3(50, -200, -1150)
+    cameraPosition: new Vector3(50, -220, -1150)
   }
 ]
 
@@ -23,11 +23,11 @@ export const primaryColor = "#1878a8"
 export const primaryDarkColor = "#092f42"
 
 export const matrixGap = 20
-export const matrixLineWidth = 2
+export const matrixLineWidth = 1
 export const boardPadding = 40
 export const boardRadius = 15
 export const indicatorOverflow = 20
-export const pieceRadius = 10
+export const pieceRadius = 8
 
 export const blackPieceColor = 0x333333
 export const whitePieceColor = 0xffffff

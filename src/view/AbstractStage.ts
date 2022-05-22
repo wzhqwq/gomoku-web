@@ -14,6 +14,7 @@ export default interface AbstractStage {
   removeChess(x: number, y: number): void
   removeAllChesses(): void
   highlightChess(x: number, y: number): void
+  unhighlightAllChesses(): void
 
   set rooms(rooms: Room[])
   set roomListLoading(loading: boolean)

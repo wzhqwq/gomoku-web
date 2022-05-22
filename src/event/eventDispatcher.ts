@@ -2,7 +2,7 @@ import BaseEvent from "./BaseEvent"
 import BoardChangedEvent from "./BoardChangedEvent"
 import ControlEvent from "./ControlEvent"
 import DoCreateRoomEvent from "./DoCreateRoomEvent"
-import { CreateRoomEvent, FetchRoomEvent } from "./emptyEvents"
+import { CreateRoomEvent, FetchRoomEvent, GameOverEvent } from "./emptyEvents"
 import IndicatorChangedEvent from "./IndicatorChangedEvent"
 import PlaceEvent from "./PlaceEvent"
 import PlayerRotateEvent from "./PlayerRotateEvent"
@@ -28,6 +28,7 @@ export interface EventMap {
   putMessage: PutMessageEvent
   request: RequestEvent
   retraction: RetractionEvent
+  gameOver: GameOverEvent
 }
 
 export type EventNameType = keyof EventMap

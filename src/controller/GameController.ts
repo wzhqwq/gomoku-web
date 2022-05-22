@@ -1,5 +1,6 @@
 import BoardChangedEvent from "@event/BoardChangedEvent";
 import ControlEvent from "@event/ControlEvent";
+import { GameOverEvent } from "@event/emptyEvents";
 import eventDispatcher from "@event/eventDispatcher";
 import IndicatorChangedEvent from "@event/IndicatorChangedEvent";
 import PlaceEvent from "@event/PlaceEvent";
@@ -16,6 +17,7 @@ import ChessboardMessage from "@model/ws/ChessboardMessage";
 import InstantMessage from "@model/ws/InstantMessage";
 import PlaceMessage from "@model/ws/PlaceMessage";
 import RetractionDealingMessage from "@model/ws/RetractionDealingMessage";
+import RetractionPreviewMessage from "@model/ws/RetractionPreview";
 import RetractionRequestMessage from "@model/ws/RetractionRequestMessage";
 import RetractionResultMessage from "@model/ws/RetractionResultMessage";
 import G from "@util/global";
@@ -39,10 +41,12 @@ export default class GameController {
     eventDispatcher.listen("sendMessage", this.handleSendMessage)
     eventDispatcher.listen("putMessage", this.handlePutMessage)
     eventDispatcher.listen("retraction", this.handleRetractionRequest)
+    eventDispatcher.listen("gameOver", this.handleGameOver)
   }
 
   public startGame(room: Room) {
     this.stage.enterGame()
+    this.stage.boardDisabled = room.isGameOver
     this.controlPanel.openPanel()
       .then(() => {
         this.controlPanel.players = room.players.map(player =>
@@ -103,6 +107,13 @@ export default class GameController {
   private handleControl = (e: ControlEvent): void => {
     switch (e.detail.type) {
       case "retract":
+        G.WSClient.send(new RetractionPreviewMessage()).then(msg => {
+          if (msg instanceof RetractionPreviewMessage) {
+            msg.playLogs.forEach(log => {
+              this.stage.highlightChess(log.chess.x, log.chess.y)
+            })
+          }
+        })
         this.controlPanel.showConfirm("确定向对手请求悔棋吗？", "放弃", "确定").then(confirmed => {
           this.controlPanel.hideConfirm()
           if (confirmed) {
@@ -111,7 +122,11 @@ export default class GameController {
             G.WSClient.send(new RetractionRequestMessage()).then(msg => {
               this.controlPanel.retracting = false
               this.stage.boardDisabled = false
+              this.stage.unhighlightAllChesses()
             })
+          }
+          else {
+            this.stage.unhighlightAllChesses()
           }
         })
         break
@@ -133,9 +148,18 @@ export default class GameController {
   }
 
   private handleRetractionRequest = (e: RetractionEvent): void => {
+    e.detail.retraction.retractedLog.forEach(log => {
+      this.stage.highlightChess(log.chess.x, log.chess.y)
+    })
     this.controlPanel.showConfirm("对方请求悔棋，是否同意？", "拒绝", "同意").then(confirmed => {
       this.controlPanel.hideConfirm()
       G.WSClient.send(new RetractionDealingMessage(confirmed))
+      this.stage.unhighlightAllChesses()
     })
+  }
+
+  private handleGameOver = (e: GameOverEvent): void => {
+    this.stage.boardDisabled = true
+    alert("游戏结束！")
   }
 }

@@ -1,5 +1,9 @@
 import * as $ from "jquery"
-import { AmbientLight, AnimationAction, AnimationMixer, Clock, LoopOnce, Matrix3, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneBufferGeometry, Raycaster, Renderer, Scene, Vector3, WebGLRenderer } from "three"
+import { AmbientLight, AnimationAction, AnimationMixer, Clock, LoopOnce, PerspectiveCamera, Raycaster, Renderer, Scene, Vector2, Vector3, WebGLRenderer } from "three"
+import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass"
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
+import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader"
 import RoomList from "@item/grouped/RoomList"
 import Room from "@model/base/Room"
 import eventDispatcher from "@event/eventDispatcher"
@@ -9,9 +13,9 @@ import Stage from "./AbstractStage"
 import ChessBoard from "@item/basic/ChessBoard"
 import { blackPieceColor, boardStyles, matrixGap, whitePieceColor } from "@util/constants"
 import SlideAnimationClip, { SlideTrack } from "@animation/SlideAnimationClip"
-import IndicatorChangedEvent from "@event/IndicatorChangedEvent"
 import Piece from "@item/basic/Piece"
 import Chess from "@model/base/Chess"
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass"
 
 export default class ThreeJsStage implements Stage {
   // DOM
@@ -25,8 +29,10 @@ export default class ThreeJsStage implements Stage {
   // Three.js
   private scene: Scene
   private camera: PerspectiveCamera
-  private renderer: Renderer
+  private renderer: WebGLRenderer
   private clock: Clock
+  private composer: EffectComposer
+  private outlinePass: OutlinePass
 
   private roomList: RoomList
   private board: ChessBoard
@@ -64,8 +70,9 @@ export default class ThreeJsStage implements Stage {
     this.scene = new Scene()
     this.renderer = new WebGLRenderer({
       canvas: this.canvas[0],
-      antialias: true
+      antialias: true,
     })
+    this.renderer.shadowMap.enabled = true
     this.clock = new Clock()
     this.camera = new PerspectiveCamera(
       60,
@@ -76,6 +83,21 @@ export default class ThreeJsStage implements Stage {
     this.camera.position.set(0, 0, 600)
     this.camera.lookAt(0, 0, 0)
     this.setLight()
+
+    this.outlinePass = new OutlinePass(
+      new Vector2(this.canvas.width(), this.canvas.height()),
+      this.scene,
+      this.camera
+    )
+    this.outlinePass.edgeStrength = 10
+    this.outlinePass.edgeGlow = 1
+    this.outlinePass.visibleEdgeColor.set("#dd00c2")
+    this.composer = new EffectComposer(this.renderer)
+    this.composer.addPass(new RenderPass(this.scene, this.camera))
+    this.composer.addPass(this.outlinePass)
+    let effectFXAA = new ShaderPass(FXAAShader)
+    effectFXAA.uniforms['resolution'].value.set(1 / this.canvas.width(), 1 / this.canvas.height())
+    this.composer.addPass(effectFXAA)
 
     this.handleResize()
 
@@ -190,7 +212,12 @@ export default class ThreeJsStage implements Stage {
     this.pieces.clear()
   }
   public highlightChess(x: number, y: number): void {
-    throw new Error("Method not implemented.")
+    this.outlinePass.selectedObjects = this.outlinePass.selectedObjects
+      .concat(this.pieces.get(x * 20 + y))
+  }
+
+  public unhighlightAllChesses(): void {
+    this.outlinePass.selectedObjects = []
   }
 
   public async leaveGame() {
@@ -223,6 +250,7 @@ export default class ThreeJsStage implements Stage {
     this.camera.updateProjectionMatrix()
 
     this.renderer.setSize(width, height)
+    this.composer.setSize(width, height)
     
     this.setRoomList(width, height)
 

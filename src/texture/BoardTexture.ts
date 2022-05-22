@@ -1,7 +1,12 @@
-import { CanvasTexture, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter } from "three"
+import { CanvasTexture, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter } from "three"
 import { boardPadding, indicatorBlocked, indicatorDefault, indicatorOverflow, matrixGap, matrixLineWidth, pieceRadius } from "@util/constants"
 
-const padding = boardPadding * 2, gap = matrixGap * 2, lineWidth = matrixLineWidth, overflow = indicatorOverflow * 2;
+const padding = boardPadding * 4
+const gap = matrixGap * 4
+const lineWidth = matrixLineWidth * 4
+const overflow = indicatorOverflow * 4
+const radius = pieceRadius * 2
+const tagWidth = gap * 0.6
 
 export default class BoardTexture extends CanvasTexture {
   private ctx: CanvasRenderingContext2D
@@ -19,7 +24,6 @@ export default class BoardTexture extends CanvasTexture {
     this.width = canvas.width
     this.generateGridBuffer()
     this.generateColumnBuffer()
-    this.minFilter = LinearMipmapNearestFilter
     this.redraw()
   }
 
@@ -59,19 +63,19 @@ export default class BoardTexture extends CanvasTexture {
   private generateColumnBuffer() {
     let ctx = this.ctx
 
-    ctx.clearRect(0, 0, this.width, 45)
+    ctx.clearRect(0, 0, this.width, tagWidth * 1.2 + 5)
 
     ctx.fillStyle = indicatorDefault
     this.drawColumnIndicators()
     this.drawColumnText(-5)
-    this.defaultColumnBuffer = ctx.getImageData(0, 0, this.width, 40)
+    this.defaultColumnBuffer = ctx.getImageData(0, 0, this.width, tagWidth * 1.2)
 
-    ctx.clearRect(0, 0, this.width, 45)
+    ctx.clearRect(0, 0, this.width, tagWidth * 1.2 + 5)
     
     ctx.fillStyle = indicatorBlocked
     this.drawColumnIndicators()
     this.drawColumnText(-5)
-    this.blockedColumnBuffer = ctx.getImageData(0, 0, this.width, 40)
+    this.blockedColumnBuffer = ctx.getImageData(0, 0, this.width, tagWidth * 1.2)
   }
 
   private drawColumnText(end: number) {
@@ -79,13 +83,13 @@ export default class BoardTexture extends CanvasTexture {
     let size = this.size
 
     ctx.textAlign = "center"
-    ctx.font = "22px sans-serif"
+    ctx.font = "38px sans-serif"
     ctx.fillStyle = "#000"
     for (let i = 0; i < size; i++) {
       ctx.fillText(
         String.fromCharCode(65 + i),
         padding + i * gap,
-        end + 34
+        end + 55
       )
     }
   }
@@ -97,13 +101,13 @@ export default class BoardTexture extends CanvasTexture {
     for (let i = 0; i < size; i++) {
       let x = padding + i * gap
       ctx.beginPath()
-      ctx.moveTo(x, lineWidth / 2)
-      ctx.lineTo(x, lineWidth / 2)
-      ctx.lineTo(x + 16, 10)
-      ctx.lineTo(x + 16, 40)
-      ctx.lineTo(x - 16, 40)
-      ctx.lineTo(x - 16, 10)
-      ctx.lineTo(x, lineWidth / 2)
+      ctx.moveTo(x, -lineWidth / 2)
+      ctx.lineTo(x, -lineWidth / 2)
+      ctx.lineTo(x + tagWidth / 2, tagWidth * 0.3)
+      ctx.lineTo(x + tagWidth / 2, tagWidth * 1.2)
+      ctx.lineTo(x - tagWidth / 2, tagWidth * 1.2)
+      ctx.lineTo(x - tagWidth / 2, tagWidth * 0.3)
+      ctx.lineTo(x, -lineWidth / 2)
       ctx.fill()
     }
   }
@@ -120,7 +124,7 @@ export default class BoardTexture extends CanvasTexture {
 
       ctx.fillStyle = "#0003"
       ctx.beginPath()
-      ctx.ellipse(x, y, pieceRadius * 2, pieceRadius * 2, 0, 0, 2 * Math.PI)
+      ctx.ellipse(x, y, radius * 2, radius * 2, 0, 0, 2 * Math.PI)
       ctx.fill()
 
       ctx.lineCap = "round"
@@ -135,8 +139,8 @@ export default class BoardTexture extends CanvasTexture {
       ctx.putImageData(
         blocked ? this.blockedColumnBuffer : this.defaultColumnBuffer,
         0, end + 5,
-        x - 16, 0,
-        32, 40
+        x - tagWidth / 2, 0,
+        tagWidth, tagWidth * 1.2
       )
 
       ctx.beginPath()

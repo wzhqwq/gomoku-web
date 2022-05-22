@@ -7,3 +7,7 @@ export class CreateRoomEvent implements BaseEvent {
 export class FetchRoomEvent implements BaseEvent {
   public TYPE = Symbol("FetchRoomEvent")
 }
+
+export class GameOverEvent implements BaseEvent {
+  public TYPE = Symbol("GameOverEvent")
+}

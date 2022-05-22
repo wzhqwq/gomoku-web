@@ -1,3 +1,4 @@
+import { GameOverEvent } from "@event/emptyEvents"
 import eventDispatcher from "@event/eventDispatcher"
 import PutMessageEvent from "@event/PutMessageEvent"
 import RequestEvent from "@event/RequestEvent"
@@ -54,6 +55,7 @@ export default class MessageBoxInterceptor implements Interceptor {
         }获胜`,
         isMine: false
       }))
+      eventDispatcher.dispatch("gameOver", new GameOverEvent())
       return
     }
   }
